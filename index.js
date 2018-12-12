@@ -2,7 +2,7 @@ import net from 'net';
 
 class Api {
   constructor(address, port, onConnect, onDisconnect) {
-    this._client = net.createConnection({ address, port }, () => {
+    this._client = net.createConnection(port, address, () => {
       onConnect();
     });
 
@@ -49,9 +49,18 @@ class Api {
       this._client.write(JSON.stringify(messageObject) + "\n");
   }
 
+  // Authenticate
+
+  authenticate(password, callback) {
+    this.startTopic('authorize', {
+      key: password
+    }, callback);
+  }
+
+  // Properties
+
   setProperty(property, value, interpolationDuration, easingFunction) {
-     this.startTopic('property', {
-       command: 'set',
+     this.startTopic('set', {
        property,
        value,
        interpolationDuration,
@@ -60,25 +69,26 @@ class Api {
   }
 
   getProperty(property, callback) {
-    return this.startTopic('property', {
-      command: 'get',
+    return this.startTopic('get', {
       property,
     }, callback);
   }
 
   subcribeToProperty(property, callback) {
-    return this.startTopic('property', {
-      command: 'subscribe',
+    return this.startTopic('subscribe', {
+      event: 'start_subscription',
       property
     }, callback);
   }
 
-  unsubscribeToProperty(property, topicId) {
+  unsubscribeToProperty(topicId) {
     this.talk(topicId, {
-      command: 'unsubscribe'
+      event: 'stop_subscription'
     });
     delete this._callbacks[topicId];
   }
+
+  // Lua scripts
 
   executeLua(script) {
     this.startTopic('luascript', {
