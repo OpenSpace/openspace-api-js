@@ -1,8 +1,10 @@
 import OpenSpaceApi from './index';
+import Socket from './socket';
+
 
 const password = '';
 
-const onConnect = () => {
+function onConnect() {
   console.log('Connected to OpenSpace');
 
   const property = 'Scene.Earth.Scale.Scale';
@@ -10,14 +12,25 @@ const onConnect = () => {
   const duration = 1;
 
   openspace.authenticate(password, (data) => {
-    console.log(data);
+    //console.log(data);
     openspace.library().then((lib) => {
       // setInterval(() => addSceneGraphNode(lib), 2000);
       // getGeoPosition(lib);
+      getTime(lib);
     });
     // scaleEarth();
   });
 }
+
+async function getTime(lib) {
+  const t = await lib.time.UTC();
+  console.log(t);
+}
+
+function onDisconnect() {
+  console.log('Disconnected from OpenSpace');
+}
+
 
 function getGeoPosition(lib) {
   lib.globebrowsing.getGeoPosition("Earth", 10, 10, 10).then(data => {
@@ -65,9 +78,10 @@ function scaleEarth() {
   });
 }
 
+const socket = new Socket('localhost', 4681);
+const openspace = new OpenSpaceApi(socket, onConnect, onDisconnect);
 
-const onDisconnect = () => {
-  console.log('Disconnected from OpenSpace');
-}
 
-const openspace = new OpenSpaceApi('localhost', 4681, onConnect, onDisconnect);
+
+
+

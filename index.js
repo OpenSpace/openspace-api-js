@@ -1,38 +1,22 @@
-import net from 'net';
-
 class Api {
-  constructor(address, port, onConnect, onDisconnect) {
-    this._client = net.createConnection(port, address, () => {
-      onConnect();
-    });
-
-    this._onDisconnect = onDisconnect || (() => {});
-    this._inBuffer = '';
-
-    this._client.on('data', (data) => {
-      this._inBuffer += data.toString();
-      let firstNewline = this._inBuffer.indexOf('\n');
-      while (firstNewline !== -1) {
-        let jsonString = this._inBuffer.substring(0, firstNewline);
-        this._inBuffer = this._inBuffer.substring(firstNewline + 1);
-        const messageObject = JSON.parse(jsonString);
-        if (messageObject.topic !== undefined) {
-          this._callbacks[messageObject.topic](messageObject.payload);
-        }
-        firstNewline = this._inBuffer.indexOf('\n');
-      }
-    });
-
-    this._client.on('end', () => {
-      this._onDisconnect();
-    });
-
+  constructor(socket, onConnect, onDisconnect) {
     this._callbacks = {};
     this._nextTopicId = 0;
+
+    socket.onMessage((message) => {
+      const messageObject = JSON.parse(message);
+      if (messageObject.topic !== undefined) {
+        this._callbacks[messageObject.topic](messageObject.payload);
+      }
+    });
+    socket.onConnect(onConnect);
+    socket.onDisconnect(onDisconnect);
+    socket.connect();
+    this._socket = socket;
   }
 
   disconnect() {
-    this._client.end();
+    this._socket.disconnect();
   }
 
   startTopic(type, payload, callback) {
@@ -45,7 +29,7 @@ class Api {
     if (callback) {
       this._callbacks[topic] = callback;
     }
-    this._client.write(JSON.stringify(messageObject) + "\n");
+    this._socket.send(JSON.stringify(messageObject));
     return topic;
   }
 
@@ -54,7 +38,7 @@ class Api {
           topic: topic,
           payload: payload
       };
-      this._client.write(JSON.stringify(messageObject) + "\n");
+      this._socket.send(JSON.stringify(messageObject));
   }
 
   // Authenticate
