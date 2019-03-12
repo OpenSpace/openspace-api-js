@@ -104,11 +104,59 @@ class Api {
 
   // Lua scripts
 
-  executeLua(script) {
+  executeLuaScript(script, callback) {
     this.startTopic('luascript', {
-      script
+      script,
+      return: !!callback
+    }, callback);
+  }
+
+  executeLuaFunction(fun, args, callback) {
+    this.startTopic('luascript', {
+      function: fun,
+      arguments: args,
+      return: !!callback
+    }, callback);
+  }
+
+  library() {
+    const generateAsyncFunction = (functionName) => {
+      return (...args) => {
+        return new Promise((resolve, reject) => {
+          this.executeLuaFunction(functionName, args, (data) => {
+            resolve(data);
+          });
+        })
+      };
+    };
+
+    return new Promise((resolve, reject) => {
+      this.getDocumentation('lua', (documentation) => {
+        const jsLibrary = {};
+
+        documentation.forEach((lib) => {
+          let subJsLibrary = undefined;
+          if (lib.library === '') {
+            subJsLibrary = jsLibrary;
+          } else {
+            subJsLibrary = jsLibrary[lib.library] = {};
+          }
+
+          lib.functions.forEach((f) => {
+            const fullFunctionName =
+              'openspace.' +
+              (subJsLibrary === jsLibrary ? '' : (lib.library + '.')) +
+              f.library;
+
+            subJsLibrary[f.library] = generateAsyncFunction(fullFunctionName);
+          });
+        });
+
+        resolve(jsLibrary);
+      });
     });
   }
+
 }
 
 export default Api;

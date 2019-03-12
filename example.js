@@ -11,43 +11,60 @@ const onConnect = () => {
 
   openspace.authenticate(password, (data) => {
     console.log(data);
-
-    openspace.getDocumentation('lua', (documentation) => {
-      const jsLibrary = {};
-
-      documentation.forEach((lib) => {
-        console.log(lib.library)
-
-        let subJsLibrary = undefined;
-        if (lib.library === '') {
-          subJsLibrary = jsLibrary;
-        } else {
-          subJsLibrary = jsLibrary[lib.library] = {};
-        }
-        lib.functions.forEach((f) => {
-          subJsLibrary[f.library] = () => {
-             const fullFunctionName =
-                'openspace.' +
-                (subJsLibrary === jsLibrary ? '' : (lib.library + '.')) +
-                f.library;
-             openspace.executeLua(fullFunctionName + '()');
-          }
-        });
-      });
-
-      jsLibrary.globebrowsing.getGeoPositionForCamera();
+    openspace.library().then((lib) => {
+      // setInterval(() => addSceneGraphNode(lib), 2000);
+      // getGeoPosition(lib);
     });
-
-    openspace.getProperty(property, (data) => {
-      console.log(data);
-      let target = 2;
-      if (data.Value > 1) {
-        target = 1;
-      }
-      openspace.setProperty(property, target, duration, easingFunction);
-    });
+    // scaleEarth();
   });
 }
+
+function getGeoPosition(lib) {
+  lib.globebrowsing.getGeoPosition("Earth", 10, 10, 10).then(data => {
+    console.log(data);
+  });
+}
+
+let nodeIndex = 0;
+async function addSceneGraphNode(lib) {
+  const identifier = 'TestNode' + nodeIndex;
+  const name = 'Test Node ' + nodeIndex;
+  const data = await lib.addSceneGraphNode({
+    Identifier: identifier,
+    Name: name,
+    Parent: 'Earth',
+    Transform: {
+      Translation: {
+        Type:"GlobeTranslation",
+        Globe: 'Earth',
+        Latitude: (nodeIndex * 13) % 90,
+        Longitude: (nodeIndex * 17) % 180,
+        FixedAltitude: 10
+      }
+    },
+    GUI: {
+      Path: "/Other/Test",
+      Name: 'TestNode'
+    }
+  });
+
+  console.log('Added ' + name);
+  lib.setPropertyValue("NavigationHandler.OrbitalNavigator.Anchor", identifier);
+  lib.setPropertyValue("NavigationHandler.OrbitalNavigator.RetargetAnchor", null);
+  nodeIndex++;
+}
+
+function scaleEarth() {
+  openspace.getProperty(property, (data) => {
+    console.log(data);
+    let target = 2;
+    if (data.Value > 1) {
+      target = 1;
+    }
+    openspace.setProperty(property, target, duration, easingFunction);
+  });
+}
+
 
 const onDisconnect = () => {
   console.log('Disconnected from OpenSpace');
