@@ -7,11 +7,19 @@ class Api {
     });
 
     this._onDisconnect = onDisconnect || (() => {});
+    this._inBuffer = '';
 
     this._client.on('data', (data) => {
-      const messageObject = JSON.parse(data.toString());
-      if (messageObject.topic !== undefined) {
-        this._callbacks[messageObject.topic](messageObject.payload);
+      this._inBuffer += data.toString();
+      let firstNewline = this._inBuffer.indexOf('\n');
+      while (firstNewline !== -1) {
+        let jsonString = this._inBuffer.substring(0, firstNewline);
+        this._inBuffer = this._inBuffer.substring(firstNewline + 1);
+        const messageObject = JSON.parse(jsonString);
+        if (messageObject.topic !== undefined) {
+          this._callbacks[messageObject.topic](messageObject.payload);
+        }
+        firstNewline = this._inBuffer.indexOf('\n');
       }
     });
 
@@ -72,6 +80,12 @@ class Api {
     return this.startTopic('get', {
       property,
     }, callback);
+  }
+
+  getDocumentation(type, callback) {
+    return this.startTopic('documentation', {
+      type
+    }, callback)
   }
 
   subcribeToProperty(property, callback) {

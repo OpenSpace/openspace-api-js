@@ -11,6 +11,33 @@ const onConnect = () => {
 
   openspace.authenticate(password, (data) => {
     console.log(data);
+
+    openspace.getDocumentation('lua', (documentation) => {
+      const jsLibrary = {};
+
+      documentation.forEach((lib) => {
+        console.log(lib.library)
+
+        let subJsLibrary = undefined;
+        if (lib.library === '') {
+          subJsLibrary = jsLibrary;
+        } else {
+          subJsLibrary = jsLibrary[lib.library] = {};
+        }
+        lib.functions.forEach((f) => {
+          subJsLibrary[f.library] = () => {
+             const fullFunctionName =
+                'openspace.' +
+                (subJsLibrary === jsLibrary ? '' : (lib.library + '.')) +
+                f.library;
+             openspace.executeLua(fullFunctionName + '()');
+          }
+        });
+      });
+
+      jsLibrary.globebrowsing.getGeoPositionForCamera();
+    });
+
     openspace.getProperty(property, (data) => {
       console.log(data);
       let target = 2;
@@ -26,4 +53,4 @@ const onDisconnect = () => {
   console.log('Disconnected from OpenSpace');
 }
 
-const openspace = new OpenSpaceApi('localhost', 8000, onConnect, onDisconnect);
+const openspace = new OpenSpaceApi('localhost', 4681, onConnect, onDisconnect);
