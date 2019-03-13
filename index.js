@@ -6,7 +6,9 @@ class Api {
     socket.onMessage((message) => {
       const messageObject = JSON.parse(message);
       if (messageObject.topic !== undefined) {
-        this._callbacks[messageObject.topic](messageObject.payload);
+        if (this._callbacks[messageObject.topic]) {
+          this._callbacks[messageObject.topic](messageObject.payload);
+        }
       }
     });
     socket.onConnect(onConnect);
@@ -19,18 +21,45 @@ class Api {
     this._socket.disconnect();
   }
 
-  startTopic(type, payload, callback) {
+  startTopic(type, payload) {
     const topic = this._nextTopicId++;
     const messageObject = {
         topic: topic,
         type: type,
         payload: payload
     };
-    if (callback) {
-      this._callbacks[topic] = callback;
-    }
     this._socket.send(JSON.stringify(messageObject));
-    return topic;
+
+
+    let promise = null;
+    const setPromise = () => {
+      promise = new Promise((resolve) => {
+        this._callbacks[topic] =
+          (data) => { resolve({action: 'cb', data: data}); };
+      });
+    }
+
+    // Todo: When stopping, the resolve should be called with some special
+    // value, which should break the stream.
+    const stop = () => {
+      delete this._callbacks[topic];
+      promise.resolve
+    }
+
+    async function* stream() {
+      while (true) {
+        setPromise();
+        const p = await promise;
+        if (p.action === 'cb') {
+          yield p.data;
+        }
+      }
+    }
+
+    return {
+      stop,
+      stream: stream()
+    }
   }
 
   talk(topic, payload) {
@@ -41,104 +70,121 @@ class Api {
       this._socket.send(JSON.stringify(messageObject));
   }
 
+  stopTopic(topic) {
+    this._callbacks[topic].unset();
+  }
+
   // Authenticate
 
-  authenticate(password, callback) {
-    this.startTopic('authorize', {
+  async authenticate(password) {
+    let topic = this.startTopic('authorize', {
       key: password
-    }, callback);
+    });
+    for await (const t of topic.stream) {
+      topic.stop();
+      return t;
+    }
+    // Todo: check data returned and reject if authentication failed.
   }
 
   // Properties
 
   setProperty(property, value, interpolationDuration, easingFunction) {
-     this.startTopic('set', {
+     const topic = this.startTopic('set', {
        property,
        value,
        interpolationDuration,
        easingFunction: easingFunction || "Linear"
      });
+     topic.stop();
   }
 
-  getProperty(property, callback) {
-    return this.startTopic('get', {
+  async getProperty(property) {
+    const topic = this.startTopic('get', {
       property,
-    }, callback);
+    });
+
+    for await (const t of topic.stream) {
+      topic.stop();
+      return t;
+    }
   }
 
-  getDocumentation(type, callback) {
-    return this.startTopic('documentation', {
+  async getDocumentation(type) {
+    const topic = this.startTopic('documentation', {
       type
-    }, callback)
+    });
+
+    for await (const t of topic.stream) {
+      return t;
+    }
   }
 
-  subcribeToProperty(property, callback) {
-    return this.startTopic('subscribe', {
+  propertyStream(property) {
+    const topic = this.startTopic('subscribe', {
       event: 'start_subscription',
       property
-    }, callback);
-  }
-
-  unsubscribeToProperty(topicId) {
-    this.talk(topicId, {
-      event: 'stop_subscription'
     });
-    delete this._callbacks[topicId];
+
+    return topic;
   }
 
   // Lua scripts
 
-  executeLuaScript(script, callback) {
-    this.startTopic('luascript', {
+  async executeLuaScript(script) {
+    const topic = this.startTopic('luascript', {
       script,
-      return: !!callback
-    }, callback);
+      return: true
+    });
+
+    for await (const data of topic.stream) {
+      topic.stop();
+      return data;
+    }
   }
 
-  executeLuaFunction(fun, args, callback) {
-    this.startTopic('luascript', {
+  async executeLuaFunction(fun, args) {
+    const topic = this.startTopic('luascript', {
       function: fun,
       arguments: args,
-      return: !!callback
-    }, callback);
+      return: true
+    });
+
+    for await (const data of topic.stream) {
+      topic.stop();
+      return data;
+    }
   }
 
-  library() {
+  async library() {
     const generateAsyncFunction = (functionName) => {
-      return (...args) => {
-        return new Promise((resolve, reject) => {
-          this.executeLuaFunction(functionName, args, (data) => {
-            resolve(data);
-          });
-        })
-      };
+      return async (...args) => {
+        return await this.executeLuaFunction(functionName, args);
+      }
     };
 
-    return new Promise((resolve, reject) => {
-      this.getDocumentation('lua', (documentation) => {
-        const jsLibrary = {};
+    const documentation = await this.getDocumentation('lua');
+    const jsLibrary = {};
 
-        documentation.forEach((lib) => {
-          let subJsLibrary = undefined;
-          if (lib.library === '') {
-            subJsLibrary = jsLibrary;
-          } else {
-            subJsLibrary = jsLibrary[lib.library] = {};
-          }
+    documentation.forEach((lib) => {
+      let subJsLibrary = undefined;
+      if (lib.library === '') {
+        subJsLibrary = jsLibrary;
+      } else {
+        subJsLibrary = jsLibrary[lib.library] = {};
+      }
 
-          lib.functions.forEach((f) => {
-            const fullFunctionName =
-              'openspace.' +
-              (subJsLibrary === jsLibrary ? '' : (lib.library + '.')) +
-              f.library;
+      lib.functions.forEach((f) => {
+        const fullFunctionName =
+          'openspace.' +
+          (subJsLibrary === jsLibrary ? '' : (lib.library + '.')) +
+          f.library;
 
-            subJsLibrary[f.library] = generateAsyncFunction(fullFunctionName);
-          });
-        });
-
-        resolve(jsLibrary);
+        subJsLibrary[f.library] = generateAsyncFunction(fullFunctionName);
       });
     });
+
+    return jsLibrary;
   }
 
 }
