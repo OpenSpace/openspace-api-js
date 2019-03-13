@@ -6,8 +6,9 @@ class Api {
     socket.onMessage((message) => {
       const messageObject = JSON.parse(message);
       if (messageObject.topic !== undefined) {
-        if (this._callbacks[messageObject.topic]) {
-          this._callbacks[messageObject.topic](messageObject.payload);
+        const cb = this._callbacks[messageObject.topic];
+        if (cb) {
+          cb(messageObject.payload);
         }
       }
     });
@@ -24,84 +25,88 @@ class Api {
   startTopic(type, payload) {
     const topic = this._nextTopicId++;
     const messageObject = {
-        topic: topic,
-        type: type,
-        payload: payload
+        topic,
+        type,
+        payload
     };
+
     this._socket.send(JSON.stringify(messageObject));
 
-
-    let promise = null;
-    const setPromise = () => {
-      promise = new Promise((resolve) => {
-        this._callbacks[topic] =
-          (data) => { resolve({action: 'cb', data: data}); };
+    const promise = () => {
+      return new Promise((resolve, reject) => {
+        this._callbacks[topic] = resolve;
+        cancelled.then(() => {
+          delete this._callbacks[topic];
+        });
       });
     }
 
-    // Todo: When stopping, the resolve should be called with some special
-    // value, which should break the stream.
-    const stop = () => {
-      delete this._callbacks[topic];
-    }
+    let cancel, cancelled = new Promise(resolve => cancel = resolve);
 
-    async function* stream() {
-      while (true) {
-        setPromise();
-        const p = await promise;
-        if (p.action === 'cb') {
-          yield p.data;
+    const iterator = (async function* () {
+      try {
+        while (true) {
+          yield await promise();
         }
+      } catch (e) {
+        return;
       }
+    })();
+
+    const talk = (payload) => {
+      const messageObject = {
+          topic,
+          payload
+      };
+      this._socket.send(JSON.stringify(messageObject));
     }
 
     return {
-      stop,
-      stream: stream()
+      cancel,
+      iterator,
+      talk
     }
   }
 
-  talk(topic, payload) {
-      const messageObject = {
-          topic: topic,
-          payload: payload
-      };
-      this._socket.send(JSON.stringify(messageObject));
-  }
-
-  // Authenticate
+  /**
+   * Authentication
+   */
 
   async authenticate(password) {
     let topic = this.startTopic('authorize', {
       key: password
     });
-    for await (const t of topic.stream) {
-      topic.stop();
-      return t;
+    try {
+      const response = await topic.iterator.next();
+      topic.cancel();
+      return response.value;
+    } catch (e) {
+      throw "Authentication error: \n" + e;
     }
-    // Todo: check data returned and reject if authentication failed.
   }
 
-  // Properties
+  /**
+   * Properties
+   */
 
-  setProperty(property, value, interpolationDuration, easingFunction) {
+  setProperty(property, value) {
      const topic = this.startTopic('set', {
        property,
-       value,
-       interpolationDuration,
-       easingFunction: easingFunction || "Linear"
+       value
      });
-     topic.stop();
+     topic.cancel();
   }
 
   async getProperty(property) {
     const topic = this.startTopic('get', {
       property,
     });
-
-    for await (const t of topic.stream) {
-      topic.stop();
-      return t;
+    try {
+      const response = await topic.iterator.next();
+      topic.cancel();
+      return response.value;
+    } catch (e) {
+      throw "Error getting property. \n" + e;
     }
   }
 
@@ -110,24 +115,35 @@ class Api {
       type
     });
 
-    for await (const t of topic.stream) {
-      return t;
+    try {
+      const response = await topic.iterator.next();
+      topic.cancel();
+      return response.value;
+    } catch (e) {
+      throw "Error getting documentation: \n" + e;
     }
   }
 
-  propertyStream(property) {
+  subscribeToProperty(property) {
     const topic = this.startTopic('subscribe', {
       event: 'start_subscription',
       property
     });
 
-    return topic;
-    // TODO: this.talk(topicId, {
-    //  event: 'stop_subscription'
-    // });
+    return {
+      iterator: topic.iterator,
+      cancel: () => {
+        topic.talk({
+          event: 'stop_subscription'
+        });
+        topic.cancel();
+      }
+    };
   }
 
-  // Lua scripts
+  /**
+   * Lua
+   */
 
   async executeLuaScript(script) {
     const topic = this.startTopic('luascript', {
@@ -135,9 +151,12 @@ class Api {
       return: true
     });
 
-    for await (const data of topic.stream) {
-      topic.stop();
-      return data;
+    try {
+      const response = await topic.iterator.next();
+      topic.cancel();
+      return response.value;
+    } catch (e) {
+      throw "Error executing lua script: \n" + e;
     }
   }
 
@@ -148,20 +167,32 @@ class Api {
       return: true
     });
 
-    for await (const data of topic.stream) {
-      topic.stop();
-      return data;
+    try {
+      const response = await topic.iterator.next();
+      topic.cancel();
+      return response.value;
+    } catch (e) {
+      throw "Error executing lua function: \n" + e
     }
   }
 
   async library() {
     const generateAsyncFunction = (functionName) => {
       return async (...args) => {
-        return await this.executeLuaFunction(functionName, args);
+        try {
+          return await this.executeLuaFunction(functionName, args);
+        } catch (e) {
+          throw "Lua execution error: \n" + e
+        }
       }
     };
 
-    const documentation = await this.getDocumentation('lua');
+    let documentation;
+    try {
+      documentation = await this.getDocumentation('lua');
+    } catch (e) {
+      throw "Failed to get documentation: \n" + e;
+    }
     const jsLibrary = {};
 
     documentation.forEach((lib) => {
