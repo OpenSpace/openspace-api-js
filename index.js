@@ -43,7 +43,6 @@ class Api {
     // value, which should break the stream.
     const stop = () => {
       delete this._callbacks[topic];
-      promise.resolve
     }
 
     async function* stream() {
@@ -68,10 +67,6 @@ class Api {
           payload: payload
       };
       this._socket.send(JSON.stringify(messageObject));
-  }
-
-  stopTopic(topic) {
-    this._callbacks[topic].unset();
   }
 
   // Authenticate
@@ -127,6 +122,9 @@ class Api {
     });
 
     return topic;
+    // TODO: this.talk(topicId, {
+    //  event: 'stop_subscription'
+    // });
   }
 
   // Lua scripts
