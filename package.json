@@ -1,13 +1,14 @@
 {
-  "name": "openspace-websocket-api",
+  "name": "openspace-api-js",
   "version": "0.1.0",
-  "description": "OpenSpace WebSocket API",
+  "description": "OpenSpace Socket/Websocket API bindings for JavaScript",
   "main": "index.js",
   "scripts": {
-    "jsdoc": "rimraf docs && jsdoc -d docs package.json index.js topic.js && mv docs/openspace-websocket-api/0.1.0/* docs"
+    "jsdoc": "rimraf docs && jsdoc -d docs package.json index.js topic.js && mv docs/openspace-api/0.1.0/* docs"
   },
-  "author": "Emil Axelsson",
+  "author": "OpenSpace Team",
   "license": "MIT",
+  "repository": "https://github.com/OpenSpace/openspace-api-js",
   "devDependencies": {
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
