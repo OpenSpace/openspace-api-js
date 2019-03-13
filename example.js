@@ -3,13 +3,23 @@ import Socket from './socket';
 
 const password = '';
 
-async function onConnect() {
+const socket = new Socket('localhost', 4681);
+const api = new OpenSpaceApi(socket);
+
+(async () => {
+
+  try {
+    await api.connect();
+  } catch (e) {
+    console.log('Could not connect to OpenSpace.');
+  }
+
   console.log('Connected to OpenSpace');
 
   try {
     await api.authenticate(password);
   } catch(e) {
-    console.log('Authenication failed');
+    console.log('Authenication failed. Error: \n', e);
     return;
   };
 
@@ -26,7 +36,9 @@ async function onConnect() {
   // getScaleUpdates();
   // setInterval(() => addSceneGraphNode(openspace), 2000);
   // scaleEarth(api);
-}
+})();
+
+// Functions:
 
 async function getScaleUpdates() {
   const subscription = api.subscribeToProperty('Scene.Earth.Scale.Scale');
@@ -129,11 +141,3 @@ async function scaleEarth(api) {
   api.setProperty(property, target);
 
 }
-
-const socket = new Socket('localhost', 4681);
-const api = new OpenSpaceApi(socket, onConnect, onDisconnect);
-
-
-
-
-

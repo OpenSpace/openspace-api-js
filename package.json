@@ -1,16 +1,18 @@
 {
   "name": "openspace-websocket-api",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "OpenSpace WebSocket API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "jsdoc": "rimraf docs && jsdoc -d docs package.json index.js topic.js"
   },
   "author": "Emil Axelsson",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.3.4",
-    "@babel/preset-env": "^7.3.4"
+    "@babel/preset-env": "^7.3.4",
+    "jsdoc": "^3.5.5",
+    "rimraf": "^2.6.3"
   },
   "dependencies": {}
 }
