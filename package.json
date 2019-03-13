@@ -4,7 +4,7 @@
   "description": "OpenSpace WebSocket API",
   "main": "index.js",
   "scripts": {
-    "jsdoc": "rimraf docs && jsdoc -d docs package.json index.js topic.js"
+    "jsdoc": "rimraf docs && jsdoc -d docs package.json index.js topic.js && mv docs/openspace-websocket-api/0.1.0/* docs"
   },
   "author": "Emil Axelsson",
   "license": "MIT",
