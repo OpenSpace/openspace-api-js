@@ -6,4 +6,4 @@ Both the API and libary are still very much work in progress, and are subject to
 
 ## Documentation
 
-A [reference](https://emiax.github.io/openspace-websocket-api) can be found here. Please refer to `example.js` for some examples.
+A [reference](https://openspace.github.io/openspace-api-js) can be found here. Please refer to `example.js` for some examples.
