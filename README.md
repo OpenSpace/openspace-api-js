@@ -1,4 +1,4 @@
-# openspace-websocket-api
+# openspace-api-js
 JavaScript library to interface with [OpenSpace](https://github.com/OpenSpace/OpenSpace) using sockets and WebSockets.
 
 ## Work in progress
