@@ -1,4 +1,4 @@
-export default class WebSocket {
+export default class WebSocketWrapper {
   constructor(address, port) {
     this._address = address;
     this._port = port;    
@@ -17,11 +17,13 @@ export default class WebSocket {
   }
   
   onMessage(cb) {
-    this._onMessage = cb;
+    this._onMessage = (event) => {
+      cb(event.data)
+    };
   }
 
   connect() {
-    this._client = new WebSocket(this._address + ":" + this._port);
+    this._client = new WebSocket("ws://" + this._address + ":" + this._port);
     this._client.onopen = this._onConnect;
     this._client.onclose = this._onDisconnect;
     this._client.onmessage = this._onMessage;

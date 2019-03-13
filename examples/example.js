@@ -1,4 +1,4 @@
-import OpenSpaceApi from './index';
+import OpenSpaceApi from '../src/api';
 import Socket from './socket';
 
 const password = '';
@@ -6,7 +6,11 @@ const password = '';
 const socket = new Socket('localhost', 4681);
 const api = new OpenSpaceApi(socket);
 
-(async () => {
+api.onDisconnect(() => {
+  console.log('Disconnected from OpenSpace');
+});
+
+api.onConnect(async () => {
 
   try {
     await api.connect();
@@ -36,7 +40,10 @@ const api = new OpenSpaceApi(socket);
   // getScaleUpdates();
   // setInterval(() => addSceneGraphNode(openspace), 2000);
   // scaleEarth(api);
-})();
+});
+
+api.connect();
+
 
 // Functions:
 
@@ -67,9 +74,7 @@ async function getTime(openspace) {
   }
 }
 
-function onDisconnect() {
-  console.log('Disconnected from OpenSpace');
-}
+
 
 async function getGeoPosition(openspace) {
   try {

@@ -1,6 +1,6 @@
 import net from 'net';
 
-export default class Socket {
+export default class SocketWrapper {
   constructor(address, port) {
     this._address = address;
     this._port = port;    

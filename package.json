@@ -4,6 +4,7 @@
   "description": "OpenSpace Socket/Websocket API bindings for JavaScript",
   "main": "index.js",
   "scripts": {
+    "build": "rimraf dist && webpack --config webpack.config.js",
     "jsdoc": "rimraf docs && jsdoc -d docs package.json index.js topic.js && mv docs/openspace-api/0.1.0/* docs"
   },
   "author": "OpenSpace Team",
@@ -12,8 +13,13 @@
   "devDependencies": {
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
+    "babel-loader": "^8.0.5",
     "jsdoc": "^3.5.5",
-    "rimraf": "^2.6.3"
+    "rimraf": "^2.6.3",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@babel/polyfill": "^7.2.5"
+  }
 }
