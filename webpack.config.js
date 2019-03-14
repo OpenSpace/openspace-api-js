@@ -6,7 +6,7 @@ const browserGlobalConfig = {
   target: 'web',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'openspace-api.browser-global.js'
+    filename: 'openspace-api.js'
   },
   module: {
     rules: [
