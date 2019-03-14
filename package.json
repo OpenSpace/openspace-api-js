@@ -2,7 +2,10 @@
   "name": "openspace-api-js",
   "version": "0.1.0",
   "description": "OpenSpace Socket/Websocket API bindings for JavaScript",
-  "main": "index.js",
+  "main": "src/node.js",
+  "browser": {
+    "./src/node.js": "./src/browser.js"
+  },
   "scripts": {
     "build": "rimraf dist && webpack --config webpack.config.js",
     "jsdoc": "rimraf docs && jsdoc -d docs package.json index.js topic.js && mv docs/openspace-api/0.1.0/* docs"

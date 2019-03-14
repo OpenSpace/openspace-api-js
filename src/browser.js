@@ -1,9 +1,9 @@
 import '@babel/polyfill';
-import OpenSpaceApi from './api';
+import Api from './api';
 import Ws from './websocket';
 
-export default openspaceApi = (address, port) => {
-	return new OpenSpaceApi(
+export default (address, port) => {
+	return new Api(
 		new Ws(address || 'localhost', port || 4682)
 	);
 }

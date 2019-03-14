@@ -11,13 +11,6 @@ api.onDisconnect(() => {
 });
 
 api.onConnect(async () => {
-
-  try {
-    await api.connect();
-  } catch (e) {
-    console.log('Could not connect to OpenSpace.');
-  }
-
   console.log('Connected to OpenSpace');
 
   try {
@@ -52,7 +45,7 @@ async function getScaleUpdates() {
   let i = 0;
   (async () => {
     try {
-      for await (const data of subscription.iterator) {
+      for await (const data of subscription.iterator()) {
         console.log(data);
         if (i > 3) {
           subscription.cancel();
