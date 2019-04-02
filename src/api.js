@@ -285,9 +285,9 @@ class OpenSpaceApi {
         const fullFunctionName =
           'openspace.' +
           (subJsLibrary === jsLibrary ? '' : (lib.library + '.')) +
-          f.library;
+          f.name;
 
-        subJsLibrary[f.library] = generateAsyncFunction(fullFunctionName);
+        subJsLibrary[f.name] = generateAsyncFunction(fullFunctionName);
       });
     });
 
