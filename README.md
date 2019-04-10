@@ -6,4 +6,13 @@ Both the API and libary are still very much work in progress, and are subject to
 
 ## Documentation
 
-A [reference](https://openspace.github.io/openspace-api-js) can be found here. Please refer to `example.js` for some examples.
+A [reference](https://openspace.github.io/openspace-api-js) can be found here. Examples are available below:
+
+### NodeJS in the terminal
+https://github.com/OpenSpace/openspace-api-js/blob/master/examples/example.js provides an example of how to connect from a NodeJS. To run it, run `npm example.js` in a terminal.
+
+### Simple website
+https://github.com/OpenSpace/openspace-api-js/blob/master/examples/index.html provides an example of connecting to OpenSpace from a website. For simplicity, the example is self-contained in the index.html file.
+
+### Web application
+For a proper example of how to interact with OpenSpace from a web application using npm, webpack and modern ES versions, please refer to https://github.com/OpenSpace/openspace-api-web-example.
