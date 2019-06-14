@@ -1,4 +1,4 @@
-export default class WebSocketWrapper {
+module.exports = class WebSocketWrapper {
   constructor(address, port) {
     this._address = address;
     this._port = port;    

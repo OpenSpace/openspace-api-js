@@ -1,8 +1,10 @@
-import '@babel/polyfill';
-import Api from './api';
-import Ws from './websocket';
+require('core-js/stable');
+require('regenerator-runtime/runtime')
 
-export default (address, port) => {
+const Api = require('./api');
+const Ws = require('./websocket');
+
+module.exports = (address, port) => {
 	return new Api(
 		new Ws(address || 'localhost', port || 4682)
 	);

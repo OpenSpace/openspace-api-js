@@ -37,4 +37,4 @@ class Topic {
   }
 }
 
-export default Topic;
+module.exports = Topic;

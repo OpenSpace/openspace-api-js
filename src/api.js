@@ -1,4 +1,4 @@
-import Topic from './topic';
+const Topic = require('./topic');
 
 class OpenSpaceApi {
 
@@ -295,4 +295,4 @@ class OpenSpaceApi {
   }
 }
 
-export default OpenSpaceApi;
+module.exports = OpenSpaceApi;

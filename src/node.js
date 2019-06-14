@@ -1,7 +1,7 @@
-import OpenSpaceApi from './api';
-import Socket from './socket';
+const OpenSpaceApi = require('./api');
+const Socket = require('./socket');
 
-export default openspaceApi = (address, port) => {
+module.exports = (address, port) => {
 	return new OpenSpaceApi(
 		new Socket(address || 'localhost', port || 4681)
 	);

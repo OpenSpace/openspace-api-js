@@ -1,6 +1,8 @@
-import '@babel/polyfill';
-import Api from './api';
-import Ws from './websocket';
+require('core-js/stable');
+require('regenerator-runtime/runtime')
+
+const Api = require('./api');
+const Ws = require('./websocket');
 
 window.openspaceApi = (address, port) => {
 	return new Api(

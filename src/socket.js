@@ -1,6 +1,6 @@
-import net from 'net';
+const net = require('net');
 
-export default class SocketWrapper {
+module.exports = class SocketWrapper {
   constructor(address, port) {
     this._address = address;
     this._port = port;    
