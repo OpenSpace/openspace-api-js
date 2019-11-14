@@ -294,7 +294,10 @@ class OpenSpaceApi {
       return async (...args) => {
         try {
           const luaTable = await this.executeLuaFunction(functionName, args);
-          return luaTable[1];
+          if (luaTable) {
+            return luaTable[1];
+          }
+          return null;
         } catch (e) {
           throw "Lua execution error: \n" + e
         }
@@ -338,7 +341,7 @@ class OpenSpaceApi {
    * This method only returns the first return value.
    */
   async singleReturnLibrary() {
-    return await this.library(true);
+    return await this.library(false);
   }
 
   /**
@@ -348,7 +351,7 @@ class OpenSpaceApi {
    * with 1-indexed values.
    */
   async multiReturnLibrary() {
-    return await this.library(false);
+    return await this.library(true);
   }
 }
 
