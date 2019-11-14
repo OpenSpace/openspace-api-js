@@ -24,9 +24,9 @@
   api.onConnect(function () {
 
     // Example 1: Execute a lua function to get the current simulation time.
-    api.library().then(function (openspace) {
+    api.singleReturnLibrary().then(function (openspace) {
       openspace.time.UTC().then(function (data) {
-        console.log("OpenSpace simulation time is " + data[1]);
+        console.log("OpenSpace simulation time is " + data);
       });
     });
 
