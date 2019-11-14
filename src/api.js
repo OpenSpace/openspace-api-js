@@ -64,6 +64,10 @@ class OpenSpaceApi {
    * @return {Topic} - An object representing the topic.
    */
   startTopic(type, payload) {
+    if (typeof type !== 'string') {
+      throw("Topic type must be a string")
+    }
+
     const topic = this._nextTopicId++;
     const messageObject = {
         topic,
@@ -129,7 +133,10 @@ class OpenSpaceApi {
    * @param {*} value - The value to set the property to.
    */
   setProperty(property, value) {
-     const topic = this.startTopic('set', {
+    if (typeof property !== 'string') {
+      throw("Property must be a valid uri string")
+    }
+    const topic = this.startTopic('set', {
        property,
        value
      });
@@ -142,6 +149,9 @@ class OpenSpaceApi {
    * @return {*} The value of the property.
    */
   async getProperty(property) {
+    if (typeof property !== 'string') {
+      throw("Property must be a valid uri string")
+    }
     const topic = this.startTopic('get', {
       property,
     });
@@ -182,6 +192,9 @@ class OpenSpaceApi {
    *         When cancelled, this object will unsubscribe to the property.
    */
   subscribeToProperty(property) {
+    if (typeof property !== 'string') {
+      throw("Property must be a valid uri string")
+    }
     const topic = this.startTopic('subscribe', {
       event: 'start_subscription',
       property
@@ -202,10 +215,13 @@ class OpenSpaceApi {
   /**
    * Execute a lua script
    * @param {string} script - The lua script to execute.
-   * @param {string} getReturnValue - Specified whether the return value should be collected.
+   * @param {bool} getReturnValue - Specified whether the return value should be collected.
    * @return {*} The return value of the script, if `getReturnValue` is true, otherwise undefined.
    */
   async executeLuaScript(script, getReturnValue = true) {
+    if (typeof script !== 'string') {
+      throw("Script must be a string")
+    }
     const topic = this.startTopic('luascript', {
       script,
       return: getReturnValue
@@ -231,6 +247,9 @@ class OpenSpaceApi {
    * @return {*} The return value of the script, if `getReturnValue` is true, otherwise undefined.
    */
   async executeLuaFunction(fun, args, getReturnValue = true) {
+    if (typeof fun !== 'string') {
+      throw("Function must be a string")
+    }
     const topic = this.startTopic('luascript', {
       function: fun,
       arguments: args,
@@ -252,13 +271,30 @@ class OpenSpaceApi {
 
   /**
    * Get an object representing the OpenSpace lua library.
+   * @param {bool} multiReturn - whether the library should return the raw lua tables.
+   *   If this value is true, the 1-indexed lua table will be returned as a JavaScript object.
+   *   if the value is false, the only the first return value will be returned
    * @return {Object} The lua library, mapped to async JavaScript functions.
    */
-  async library() {
-    const generateAsyncFunction = (functionName) => {
+  async library(multiReturn) {
+    if (multiReturn === undefined) {
+      multiReturn = true;
+    }
+    const generateAsyncMultiRetFunction = functionName => {
       return async (...args) => {
         try {
           return await this.executeLuaFunction(functionName, args);
+        } catch (e) {
+          throw "Lua execution error: \n" + e
+        }
+      }
+    };
+
+    const generateAsyncSingleRetFunction = functionName => {
+      return async (...args) => {
+        try {
+          const luaTable = await this.executeLuaFunction(functionName, args);
+          return luaTable[1];
         } catch (e) {
           throw "Lua execution error: \n" + e
         }
@@ -273,7 +309,7 @@ class OpenSpaceApi {
     }
     const jsLibrary = {};
 
-    documentation.forEach((lib) => {
+    documentation.forEach(lib => {
       let subJsLibrary = undefined;
       if (lib.library === '') {
         subJsLibrary = jsLibrary;
@@ -281,17 +317,38 @@ class OpenSpaceApi {
         subJsLibrary = jsLibrary[lib.library] = {};
       }
 
-      lib.functions.forEach((f) => {
+      lib.functions.forEach(f => {
         const fullFunctionName =
           'openspace.' +
           (subJsLibrary === jsLibrary ? '' : (lib.library + '.')) +
           f.name;
 
-        subJsLibrary[f.name] = generateAsyncFunction(fullFunctionName);
+        subJsLibrary[f.name] = multiReturn ?
+          generateAsyncMultiRetFunction(fullFunctionName) :
+          generateAsyncSingleRetFunction(fullFunctionName);
       });
     });
 
     return jsLibrary;
+  }
+
+  /**
+   * Get an object representing the OpenSpace lua library.
+   * @return {Object} The lua library, mapped to async JavaScript functions.
+   * This method only returns the first return value.
+   */
+  async singleReturnLibrary() {
+    return await this.library(true);
+  }
+
+  /**
+   * Get an object representing the OpenSpace lua library.
+   * @return {Object} The lua library, mapped to async JavaScript functions.
+   * The values returned by the async functions will be the entire lua tables,
+   * with 1-indexed values.
+   */
+  async multiReturnLibrary() {
+    return await this.library(false);
   }
 }
 

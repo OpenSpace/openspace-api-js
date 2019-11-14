@@ -22,7 +22,7 @@ api.onConnect(async () => {
 
   let openspace = {};
   try {
-    openspace = await api.library();
+    openspace = await api.singleReturnLibrary();
   } catch (e) {
     console.log('OpenSpace library could not be loaded: Error: \n', e)
     return;
@@ -61,7 +61,7 @@ async function getScaleUpdates() {
 async function getTime(openspace) {
   try {
     const t = await openspace.time.UTC();
-    console.log("Current simulation time: " + t[1]);
+    console.log("Current simulation time: " + t);
   } catch (e) {
     console.log('failed to get time. Error: \n', e);
   }
