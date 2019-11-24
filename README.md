@@ -16,3 +16,9 @@ https://github.com/OpenSpace/openspace-api-js/blob/master/examples/index.html pr
 
 ### Web application
 For a proper example of how to interact with OpenSpace from a web application using npm, webpack and modern ES versions, please refer to https://github.com/OpenSpace/openspace-api-web-example.
+
+
+### Observable Notebook
+Use Obserable notebooks to interact with OpenSpace locally:
+https://observablehq.com/@emiax/openspace-notebook-example
+This may be useful for tinkering, GUI prototyping and testing the lua interface during development.
