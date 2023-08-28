@@ -216,15 +216,17 @@ class OpenSpaceApi {
    * Execute a lua script
    * @param {string} script - The lua script to execute.
    * @param {bool} getReturnValue - Specified whether the return value should be collected.
+   * @param {bool} shouldBeSynchronized - Specified whether the script should be synchronized on a cluster
    * @return {*} The return value of the script, if `getReturnValue` is true, otherwise undefined.
    */
-  async executeLuaScript(script, getReturnValue = true) {
+  async executeLuaScript(script, getReturnValue = true, shouldBeSynchronized = true) {
     if (typeof script !== 'string') {
       throw("Script must be a string")
     }
     const topic = this.startTopic('luascript', {
       script,
-      return: getReturnValue
+      return: getReturnValue,
+      shouldBeSynchronized
     });
 
     if (getReturnValue) {
@@ -234,7 +236,7 @@ class OpenSpaceApi {
         return response.value;
       } catch (e) {
         throw "Error executing lua script: \n" + e;
-      }      
+      }
     } else {
       topic.cancel();
     }
