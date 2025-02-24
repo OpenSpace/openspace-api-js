@@ -73,7 +73,7 @@ def writeFunctionToFile(file, fun):
     Writes a function with corresponding documentation, arguments, and return type to file
     """
     writeFunctionDocumentation(file, fun)
-    file.write(f"  {fun["name"]}: ")
+    file.write(f'  {fun["name"]}: ')
     writeFunctionArguments(file, fun)
     writeFunctionReturnType(file, fun)
 
