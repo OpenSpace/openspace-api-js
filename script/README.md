@@ -9,7 +9,7 @@ Instead of publishing the `openspace-api-js.d.ts` file to the @types namespace o
 # Usage
 
 1.  Copy the `openspace-api-js.d.ts` file from the `declaration` folder to your project's `src` folder.
-2.  Ensure your TypeScript configuration (`tsconfig.json`) includes the copied `.d.ts`file in `compilerOptions`, if necessary.
+2.  Ensure that your TypeScript configuration (`tsconfig.json`) includes the copied `.d.ts`file in `compilerOptions`, if necessary.
 
 # Generating an Updated TypeScript Declaration File
 
