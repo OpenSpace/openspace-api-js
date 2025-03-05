@@ -6,12 +6,12 @@ This folder contains a helper Python script that generates a TypeScript declarat
 
 Instead of publishing the `openspace-api-js.d.ts` file to the @types namespace on npm or the DefinitelyTyped repository, we keep it in this repository. Since the OpenSpace Lua API updates frequently, maintaining control over the TypeScript declaration file ensures that changes can be reflected quickly without going through a lengthy approval process.
 
-## Usage
+# Usage
 
 1.  Copy the `openspace-api-js.d.ts` file from the `declaration` folder to your project's `src` folder.
 2.  Ensure your TypeScript configuration (`tsconfig.json`) includes the copied `.d.ts`file in `compilerOptions`, if necessary.
 
-## Generating an Updated TypeScript Declaration File
+# Generating an Updated TypeScript Declaration File
 
 The TypeScript declaration file needs to match the Lua API of the specific OpenSpace version you're using for your project. Note that the file in this repository might not be up to date with the latest OpenSpace master, or even released version.
 
@@ -38,14 +38,14 @@ python generatetypescriptfile.py
 
 5. The updated `openspace-api-js.d.ts` file will be saved automatically in the `declaration` folder.
 
-## Prerequisites
+# Prerequisites
 
 - Python >= 3.8
 - The OpenSpace Python API is required, see [repository](https://github.com/OpenSpace/openspace-api-python) for further details.
 - Dependencies must be installed using the provided `requirements.txt` file.
 - OpenSpace must be running when executing the script
 
-## Caveats
+# Caveats
 
 - As of 2025-03-05 the functions `propertyValue` and `setPropertyValueSingle` do not retrieve their correct function signatures from OpenSpace due to their implementation in C++. To call these functions correctly from a TypeScript context, their type definitions must be manually adjusted:
 - Change:
