@@ -22,14 +22,14 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-declare module "openspace-api-js" {
+declare module 'openspace-api-js' {
   export class OpenSpaceApi {
     /**
      * Construct an instance of the OpenSpace API.
      * @param socket An instance of Socket or WebSocket.
      *               The socket should not be connected prior to calling this constructor.
      */
-    constructor(socket: Socket);
+    constructor(socket: SocketWrapper | WebSocketWrapper);
 
     /**
      * Set connect callback.
@@ -162,9 +162,26 @@ declare module "openspace-api-js" {
     multiReturnLibrary(): Promise<OpenSpace.openspace>;
   }
 
-  export class Socket {
+  export class SocketWrapper {
     /** Internal usage only */
-    constructor(host: string, port: number);
+    constructor(address: string, port: number);
+    onConnect(cb: () => void): void;
+    onDisconnect(cb: () => void): void;
+    onMessage(cb: (message: string) => void): void;
+    connect(): void;
+    send(message: any): void;
+    disconnect(): void;
+  }
+
+  export class WebSocketWrapper {
+    /** Internal usage only */
+    constructor(address: string, port: number);
+    onConnect(cb: () => void): void;
+    onDisconnect(cb: () => void): void;
+    onMessage(cb: (message: string) => void): void;
+    connect(): void;
+    send(message: any): void;
+    disconnect(): void;
   }
 
   export class Topic {

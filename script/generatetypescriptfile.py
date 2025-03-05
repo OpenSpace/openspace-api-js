@@ -3,8 +3,8 @@ import asyncio
 import re
 import shutil
 
-StaticFileName = "script/openspace-api-static.txt"
-outFileName = "declaration/openspace-api-js.d.ts"
+StaticFileName = "openspace-api-static.txt"
+outFileName = "../declaration/openspace-api-js.d.ts"
 
 def writeFunctionDocumentation(file, fun):
     """Writes the documentation of a function to file."""
@@ -129,7 +129,11 @@ def writeOpenSpaceInterface(libraries, functions):
 
 async def main():
     api = openspace.Api("localhost", 4681)
-    api.connect()
+
+    try:
+        api.connect()
+    except:
+        return
 
     docs = await api.getDocumentation("lua")
 
@@ -156,5 +160,7 @@ async def main():
         file.write("} // namespace OpenSpace")
 
     api.disconnect()
+    
+    print(f'Successfully generated types file. Saved in {outFileName}')
 
 asyncio.new_event_loop().run_until_complete(main())
