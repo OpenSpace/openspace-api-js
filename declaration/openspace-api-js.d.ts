@@ -233,6 +233,7 @@ export interface openspace {
   exoplanets: exoplanetsLibrary;
   gaia: gaiaLibrary;
   globebrowsing: globebrowsingLibrary;
+  iswa: iswaLibrary;
   keyframeRecording: keyframeRecordingLibrary;
   modules: modulesLibrary;
   navigation: navigationLibrary;
@@ -349,13 +350,9 @@ export interface openspace {
    */
   fileExists: (file: string) => Promise<boolean>
   /**
-   * Returns a list of property identifiers that match the passed regular expression
-   */
-  getProperty: (regex: string) => Promise<string[]>
-  /**
    * Returns the value the property, identified by the provided URI. Deprecated in favor of the 'propertyValue' function
    */
-  getPropertyValue: () => Promise<void>
+  getPropertyValue: (uri: string) => Promise<string | number | boolean | table>
   /**
    * Get a dictionary containing the current map with custom orderings for the Scene GUI tree. Each key in the dictionary corresponds to a branch in the tree, i.e. a specific GUI path.
    */
@@ -365,7 +362,9 @@ export interface openspace {
    */
   hasMission: (identifier: string) => Promise<boolean>
   /**
-   * Returns whether a property with the given URI exists
+   * Returns whether a property with the given URI exists. The `uri` identifies the property or properties that are checked by this function and can include both wildcards `*` which match anything, as well as tags (`{tag}`) which match scene graph nodes that have this tag. There is also the ability to combine two tags through the `&`, `|`, and `~` operators. `{tag1&tag2}` will match anything that has the tag1 and the tag2. `{tag1|tag2}` will match anything that has the tag1 or the tag 2, and `{tag1~tag2}` will match anything that has tag1 but not tag2. If no wildcards or tags are provided at most one property value will be changed. With wildcards or tags all properties that match the URI are changed instead.
+
+\\param uri The URI that identifies the property or properties whose values should be changed. The URI can contain 0 or 1 wildcard `*` characters or a tag expression (`{tag}`) that identifies a property owner.
    */
   hasProperty: (uri: string) => Promise<boolean>
   /**
@@ -452,13 +451,15 @@ export interface openspace {
    */
   printWarning: (...args: any[]) => Promise<void>
   /**
-   * Returns a list of property identifiers that match the passed regular expression
+   * Returns a list of property identifiers that match the passed regular expression. The `uri` identifies the property or properties that are returned by this function and can include both wildcards `*` which match anything, as well as tags (`{tag}`) which match scene graph nodes that have this tag. There is also the ability to combine two tags through the `&`, `|`, and `~` operators. `{tag1&tag2}` will match anything that has the tag1 and the tag2. `{tag1|tag2}` will match anything that has the tag1 or the tag 2, and `{tag1~tag2}` will match anything that has tag1 but not tag2. If no wildcards or tags are provided at most one property value will be changed. With wildcards or tags all properties that match the URI are changed instead.
+
+\\param uri The URI that identifies the property or properties whose values should be changed. The URI can contain 0 or 1 wildcard `*` characters or a tag expression (`{tag}`) that identifies a property owner.
    */
-  property: (regex: string) => Promise<string[]>
+  property: (uri: string) => Promise<string[]>
   /**
-   * Returns the value the property, identified by the provided URI. Deprecated in favor of the 'propertyValue' function
+   * Returns the value of the property identified by the provided URI. This function will provide an error message if no property matching the URI is found.
    */
-  propertyValue: () => Promise<void>
+  propertyValue: (uri: string) => Promise<string | number | boolean | table>
   /**
    * Returns the number of bytes of system memory that is currently being used. This function only works on Windows.
    */
@@ -504,7 +505,7 @@ export interface openspace {
   /**
    * Removes all SceneGraphNodes with identifiers matching the input regular expression.
    */
-  removeSceneGraphNodesFromRegex: (name: string) => Promise<void>
+  removeSceneGraphNodesFromRegex: (regex: string) => Promise<void>
   /**
    * Given a ScreenSpaceRenderable name this script will remove it from the RenderEngine. The parameter can also be a table in which case the 'Identifier' key is used to look up the name from the table.
    */
@@ -566,15 +567,81 @@ export interface openspace {
    */
   setPathToken: (pathToken: string, path: path) => Promise<void>
   /**
-   * Sets all property(s) identified by the URI (with potential wildcards) in the first argument. The second argument can be any type, but it has to match the type that the property (or properties) expect. If the third is not present or is '0', the value changes instantly, otherwise the change will take that many seconds and the value is interpolated at each step in between. The fourth parameter is an optional easing function if a 'duration' has been specified. If 'duration' is 0, this parameter value is ignored. Otherwise, it can be one of many supported easing functions. See easing.h for available functions. The fifth argument is another Lua script that will be executed when the interpolation provided in parameter 3 finishes.
-The URI is interpreted using a wildcard in which '*' is expanded to '(.*)' and bracketed components '{ }' are interpreted as group tag names. Then, the passed value will be set on all properties that fit the regex + group name combination.
+   * Sets the property or properties identified by the URI to the specified
+value. The `uri` identifies which property or properties are affected by this function
+call and can include both wildcards `*` which match anything, as well as tags (`{tag}`)
+which match scene graph nodes that have this tag. There is also the ability to combine two
+tags through the `&`, `|`, and `~` operators. `{tag1&tag2}` will match anything that has
+the tag1 and the tag2. `{tag1|tag2}` will match anything that has the tag1 or the tag 2,
+and `{tag1~tag2}` will match anything that has tag1 but not tag2. If no wildcards or tags
+are provided at most one property value will be changed. With wildcards or tags all
+properties that match the URI are changed instead. The second argument's type must match
+the type of the property or properties or an error is raised. If a duration is provided,
+the requested change will occur over the provided number of seconds. If no duration is
+provided or the duration is 0, the change occurs instantaneously.
+
+For example `openspace.setPropertyValue("*Trail.Renderable.Enabled", true)` will enable
+any property that ends with "Trail.Renderable.Enabled", for example
+"StarTrail.Renderable.Enabled", "EarthTrail.Renderable.Enabled", but not
+"EarthTrail.Renderable.Size".
+
+`openspace.setPropertyValue("{tag1}.Renderable.Enabled", true)` will enable any node in
+the scene that has the "tag1" assigned to it.
+
+If you only want to change a single property value, also see the #setPropertyValueSingle
+function as it will do so in a more efficient way. The `setPropertyValue` function will
+work for individual property value, but is more computationally expensive.
+
+\\param uri The URI that identifies the property or properties whose values should be
+changed. The URI can contain 0 or 1 wildcard `*` characters or a tag expression (`{tag}`)
+that identifies a property owner
+\\param value The new value to which the property/properties identified by the `uri`
+should be changed to. The type of this parameter must agree with the type of the selected
+property
+\\param duration The number of seconds over which the change will occur. If not provided
+or the provided value is 0, the change is instantaneously.
+\\param easing If a duration larger than 0 is provided, this parameter controls the manner
+in which the parameter is interpolated. Has to be one of "Linear", "QuadraticEaseIn",
+"QuadraticEaseOut", "QuadraticEaseInOut", "CubicEaseIn", "CubicEaseOut", "CubicEaseInOut",
+"QuarticEaseIn", "QuarticEaseOut", "QuarticEaseInOut", "QuinticEaseIn", "QuinticEaseOut",
+"QuinticEaseInOut", "SineEaseIn", "SineEaseOut", "SineEaseInOut", "CircularEaseIn",
+"CircularEaseOut", "CircularEaseInOut", "ExponentialEaseIn", "ExponentialEaseOut",
+"ExponentialEaseInOut", "ElasticEaseIn", "ElasticEaseOut", "ElasticEaseInOut",
+"BounceEaseIn", "BounceEaseOut", "BounceEaseInOut"
+\\param postscript A Lua script that will be executed once the change of property value
+is completed. If a duration larger than 0 was provided, it is at the end of the
+interpolation. If 0 was provided, the script runs immediately.
    */
-  setPropertyValue: () => Promise<void>
+  setPropertyValue: (uri: string, value: string | number | boolean | table, duration?: number, easing?: easingfunction, postscript?: string) => Promise<void>
   /**
-   * Sets the property identified by the URI in the first argument. The second argument can be any type, but it has to match the type that the property expects. If the third is not present or is '0', the value changes instantly, otherwise the change will take that many seconds and the value is interpolated at each step in between. The fourth parameter is an optional easing function if a 'duration' has been specified. If 'duration' is 0, this parameter value is ignored. Otherwise, it has to be one of the easing functions defined in the list below. This is the same as calling the setValue method and passing 'single' as the fourth argument to setPropertyValue. The fifth argument is another Lua script that will be executed when the interpolation provided in parameter 3 finishes.
- Avaiable easing functions: Linear, QuadraticEaseIn, QuadraticEaseOut, QuadraticEaseInOut, CubicEaseIn, CubicEaseOut, CubicEaseInOut, QuarticEaseIn, QuarticEaseOut, QuarticEaseInOut, QuinticEaseIn, QuinticEaseOut, QuinticEaseInOut, SineEaseIn, SineEaseOut, SineEaseInOut, CircularEaseIn, CircularEaseOut, CircularEaseInOut, ExponentialEaseIn, ExponentialEaseOut, ExponentialEaseInOut, ElasticEaseIn, ElasticEaseOut, ElasticEaseInOut, BounceEaseIn, BounceEaseOut, BounceEaseInOut
+   * Sets the single property identified by the URI to the specified value.
+The `uri` identifies which property is affected by this function call. The second
+argument's type must match the type of the property or an error is raised. If a duration
+is provided, the requested change will occur over the provided number of seconds. If no
+duration is provided or the duration is 0, the change occurs instantaneously.
+
+If you want to change multiple property values simultaneously, also see the
+#setPropertyValue function. The `setPropertyValueSingle` function however will work more
+efficiently for individual property values.
+
+\\param uri The URI that identifies the property
+\\param value The new value to which the property identified by the `uri` should be
+changed to. The type of this parameter must agree with the type of the selected property
+\\param duration The number of seconds over which the change will occur. If not provided
+or the provided value is 0, the change is instantaneously.
+\\param easing If a duration larger than 0 is provided, this parameter controls the manner
+in which the parameter is interpolated. Has to be one of "Linear", "QuadraticEaseIn",
+"QuadraticEaseOut", "QuadraticEaseInOut", "CubicEaseIn", "CubicEaseOut", "CubicEaseInOut",
+"QuarticEaseIn", "QuarticEaseOut", "QuarticEaseInOut", "QuinticEaseIn", "QuinticEaseOut",
+"QuinticEaseInOut", "SineEaseIn", "SineEaseOut", "SineEaseInOut", "CircularEaseIn",
+"CircularEaseOut", "CircularEaseInOut", "ExponentialEaseIn", "ExponentialEaseOut",
+"ExponentialEaseInOut", "ElasticEaseIn", "ElasticEaseOut", "ElasticEaseInOut",
+"BounceEaseIn", "BounceEaseOut", "BounceEaseInOut"
+\\param postscript This parameter specifies a Lua script that will be executed once the
+change of property value is completed. If a duration larger than 0 was provided, it is
+at the end of the interpolation. If 0 was provided, the script runs immediately.
    */
-  setPropertyValueSingle: () => Promise<void>
+  setPropertyValueSingle: (uri: string, value: string | number | boolean | table, duration?: number, easing?: easingfunction, postscript?: string) => Promise<void>
   /**
    * Sets the folder used for storing screenshots or session recording frames
    */
@@ -687,6 +754,10 @@ interface assetLibrary {
    * Returns true if the referenced asset already has been loaded. Otherwise false is returned. The parameter to this function is the path of the asset that should be tested.
    */
   isLoaded: (assetName: string) => Promise<boolean>
+  /**
+   * Reloads the asset with the specified name. If the asset was previously loaded explicity it will be removed and then re-added. If the asset was not previously loaded, it will only be loaded instead.
+   */
+  reload: (assetName: string) => Promise<void>
   /**
    * Removes the asset with the specfied name from the scene. The parameter to this function is the same that was originally used to load this asset, i.e. the path to the asset file.
    */
@@ -936,10 +1007,6 @@ interface exoplanetsLibrary {
    */
   addExoplanetSystems: (listOfStarNames: string[]) => Promise<void>
   /**
-   * Deprecated in favor of 'listOfExoplanets'
-   */
-  getListOfExoplanets: () => Promise<string[]>
-  /**
    * Lists the names of the host stars of all exoplanet systems that have sufficient data for generating a visualization, and prints the list to the console.
    */
   listAvailableExoplanetSystems: () => Promise<void>
@@ -1152,69 +1219,17 @@ interface globebrowsingLibrary {
    */
   deleteLayer: (globeIdentifier: string, layerGroup: string, layerOrName: string | table) => Promise<void>
   /**
-   * Fly the camera to a geographic coordinate (latitude, longitude and altitude) on a globe, using the path navigation system.
-
-\\param globe The identifier of a scene graph node that has a RenderableGlobe attached. If an empty string is provided, the current anchor node is used \\param latitude The latitude of the target coordinate, in degrees \\param longitude The longitude of the target coordinate, in degrees \\param altitude The altitude of the target coordinate, in meters \\param duration An optional duration for the motion to take, in seconds. For example, a value of 5 means \"fly to this position over a duration of 5 seconds\" \\param shouldUseUpVector If true, try to use the up-direction when computing the target position for the camera. For globes, this means that North should be up, in relation to the camera's view direction. Note that for this to take effect, rolling motions must be enabled in the Path Navigator settings.
-   */
-  flyToGeo: (globe: string, latitude: number, longitude: number, altitude: number, duration?: number, shouldUseUpVector?: boolean) => Promise<void>
-  /**
-   * Fly the camera to a geographic coordinate (latitude and longitude) on a globe, using the path navigation system.
-
-The distance to fly to can either be set to be the current distance of the camera to the target object, or the default distance from the path navigation system.
-
-\\param globe The identifier of a scene graph node that has a RenderableGlobe attached. If an empty string is provided, the current anchor node is used \\param latitude The latitude of the target coordinate, in degrees \\param longitude The longitude of the target coordinate, in degrees \\param useCurrentDistance If true, use the current distance of the camera to the target globe when going to the specified position. If false, or not specified, set the distance based on the bounding sphere and the distance factor setting in Path Navigator \\param duration An optional duration for the motion to take, in seconds. For example, a value of 5 means \"fly to this position over a duration of 5 seconds\" \\param shouldUseUpVector If true, try to use the up-direction when computing the target position for the camera. For globes, this means that North should be up, in relation to the camera's view direction. Note that for this to take effect, rolling motions must be enabled in the Path Navigator settings.
-   */
-  flyToGeo2: (globe: string, latitude: number, longitude: number, useCurrentDistance?: boolean, duration?: number, shouldUseUpVector?: boolean) => Promise<void>
-  /**
    * Get geographic coordinates of the camera position in latitude, longitude, and altitude (degrees and meters).
 
 \\param useEyePosition If true, use the view direction of the camera instead of the camera position
    */
   geoPositionForCamera: (useEyePosition?: boolean) => Promise<[number, number, number]>
   /**
-   * Get geographic coordinates of the camera position in latitude, longitude, and altitude (degrees and meters).
-
-Deprecated in favor of `geoPositionForCamera`.
-
-\\param useEyePosition If true, use the view direction of the camera instead of the camera position
-   */
-  getGeoPositionForCamera: (useEyePosition?: boolean) => Promise<[number, number, number]>
-  /**
-   * Returns the list of layers for the specified globe for a specific layer group.
-
-Deprecated in favor of `layers`.
-
-\\param globeIdentifier The identifier of the scene graph node for the globe \\param layerGroup The identifier of the layer group for which to list the layers
-   */
-  getLayers: (globeIdentifier: string, layerGroup: string) => Promise<string[]>
-  /**
-   * Returns the position in the local Cartesian coordinate system of the specified globe that corresponds to the given geographic coordinates. In the local coordinate system, the position (0,0,0) corresponds to the globe's center.
-
-Deprecated in favor of `localPositionFromGeo`.
-
-\\param globeIdentifier The identifier of the scene graph node for the globe \\param latitude The latitude of the geograpic position, in degrees \\param longitude The longitude of the geographic position, in degrees \\param altitude The altitude, in meters
-   */
-  getLocalPositionFromGeo: (globeIdentifier: string, latitude: number, longitude: number, altitude: number) => Promise<[number, number, number]>
-  /**
    * Go to the chunk on a globe with given index x, y, level.
 
 \\param globeIdentifier The identifier of the scene graph node for the globe \\param x The x value of the tile index \\param y The y value of the tile index \\param level The level of the tile index
    */
   goToChunk: (globeIdentifier: string, x: integer, y: integer, level: integer) => Promise<void>
-  /**
-   * Immediately move the camera to a geographic coordinate on a globe.
-
-\\param globe The identifier of a scene graph node that has a RenderableGlobe attached. If an empty string is provided, the current anchor node is used \\param latitude The latitude of the target coordinate, in degrees \\param longitude The longitude of the target coordinate, in degrees \\param altitude An optional altitude, given in meters over the reference surface of the globe. If no altitude is provided, the altitude will be kept as the current distance to the reference surface of the specified globe.
-   */
-  goToGeo: (globe: string, latitude: number, longitude: number, altitude?: number) => Promise<void>
-  /**
-   * Immediately move the camera to a geographic coordinate on a globe by first fading the rendering to black, jump to the specified coordinate, and then fade in.
-
-This is done by triggering another script that handles the logic.
-
-\\param globe The identifier of a scene graph node that has a RenderableGlobe attached. If an empty string is provided, the current anchor node is used \\param latitude The latitude of the target coordinate, in degrees \\param longitude The longitude of the target coordinate, in degrees \\param altitude An optional altitude, given in meters over the reference surface of the globe. If no altitude is provided, the altitude will be kept as the current distance to the reference surface of the specified globe. \\param fadeDuration An optional duration for the fading. If not included, the property in Navigation Handler will be used
-   */
-  jumpToGeo: (globe: string, latitude: number, longitude: number, altitude?: number, fadeDuration?: number) => Promise<void>
   /**
    * Returns the list of layers for the specified globe, for a specific layer group.
 
@@ -1232,12 +1247,6 @@ This is done by triggering another script that handles the logic.
  'openspace.globebrowsing.loadWMSCapabilities' file.
    */
   loadWMSServersFromFile: (filePath: string) => Promise<void>
-  /**
-   * Returns the position in the local Cartesian coordinate system of the specified globe that corresponds to the given geographic coordinates. In the local coordinate system, the position (0,0,0) corresponds to the globe's center.
-
-\\param globeIdentifier The identifier of the scene graph node for the globe \\param latitude The latitude of the geograpic position, in degrees \\param longitude The longitude of the geographic position, in degrees \\param altitude The altitude, in meters
-   */
-  localPositionFromGeo: (globeIdentifier: string, latitude: number, longitude: number, altitude: number) => Promise<[number, number, number]>
   /**
    * Rearranges the order of a single layer on a globe. The first position in the list has index 0, and the last position is given by the number of layers minus one.
 
@@ -1269,8 +1278,8 @@ The `source` and `destination` parameters can also be the identifiers of the lay
   removeWMSServer: (name: string) => Promise<void>
   /**
    * Sets the position of a scene graph node that has a
- [GlobeTranslation](#globebrowsing_translation_globetranslation) and/or
- [GlobeRotation](#globebrowsing_rotation_globerotation).
+ [GlobeTranslation](#base_translation_globetranslation) and/or
+ [GlobeRotation](#base_rotation_globerotation).
 
  Usage:
  ```lua
@@ -1290,8 +1299,8 @@ The `source` and `destination` parameters can also be the identifiers of the lay
   setNodePosition: (nodeIdentifier: string, globeIdentifier: string, latitude: number, longitude: number, altitude?: number) => Promise<void>
   /**
    * Sets the position of a scene graph node that has a
- [GlobeTranslation](#globebrowsing_translation_globetranslation) and/or
- [GlobeRotation](#globebrowsing_rotation_globerotation) to match the camera. Only
+ [GlobeTranslation](#base_translation_globetranslation) and/or
+ [GlobeRotation](#base_rotation_globerotation) to match the camera. Only
  uses camera position not rotation. If useAltitude is true, then the position
  will also be updated to the camera's altitude.
 
@@ -1308,6 +1317,41 @@ The `source` and `destination` parameters can also be the identifiers of the lay
    */
   setNodePositionFromCamera: (nodeIdentifer: string, useAltitude?: boolean) => Promise<void>
 } // interface globebrowsingLibrary
+
+interface iswaLibrary {
+  /**
+   * Adds a cdf files to choose from.
+   */
+  addCdfFiles: (path: string) => Promise<void>
+  /**
+   * Adds a IswaCygnet.
+   */
+  addCygnet: (id?: integer, type?: string, group?: string) => Promise<void>
+  /**
+   * Adds KameleonPlanes from cdf file.
+   */
+  addKameleonPlanes: (group: string, pos: integer) => Promise<void>
+  /**
+   * Adds a Screen Space Cygnets.
+   */
+  addScreenSpaceCygnet: (d: table) => Promise<void>
+  /**
+   * Remove a Cygnets.
+   */
+  removeCygnet: (name: string) => Promise<void>
+  /**
+   * Remove a group of Cygnets.
+   */
+  removeGroup: (name: string) => Promise<void>
+  /**
+   * Remove a Screen Space Cygnets.
+   */
+  removeScreenSpaceCygnet: (id: integer) => Promise<void>
+  /**
+   * Sets the base url.
+   */
+  setBaseUrl: (url: string) => Promise<void>
+} // interface iswaLibrary
 
 interface keyframeRecordingLibrary {
   /**
@@ -1449,6 +1493,38 @@ The axis value will be rescaled from [-1, 1] to the provided [min, max] range (d
    */
   distanceToFocusInteractionSphere: () => Promise<number>
   /**
+   * Move the camera to the node with the specified identifier. The optional double specifies the duration of the motion, in seconds. If the optional bool is set to true the target up vector for camera is set based on the target node. Either of the optional parameters can be left out.
+
+\\param nodeIdentifier The identifier of the node to which we want to fly \\param useUpFromTargetOrDuration If this value is a boolean value (`true` or `false`), this value determines whether we want to end up with the camera facing along the selected node's up direction. If this value is a numerical value, refer to the documnentation of the `duration` parameter \\param duration The duration (in seconds) how long the flying to the selected node should take. If this value is left out, a sensible default value is uses, which can be configured in the engine
+   */
+  flyTo: (nodeIdentifier: string, useUpFromTargetOrDuration?: boolean | number, duration?: number) => Promise<void>
+  /**
+   * Fly the camera to a geographic coordinate (latitude, longitude and altitude) on a globe, using the path navigation system. If the node is a globe, the longitude and latitude is expressed in the body's native coordinate system. If it is not, the position on the surface of the interaction sphere is used instead.
+
+\\param node The identifier of a scene graph node. If an empty string is provided, the current anchor node is used \\param latitude The latitude of the target coordinate, in degrees \\param longitude The longitude of the target coordinate, in degrees \\param altitude The altitude of the target coordinate, in meters \\param duration An optional duration for the motion to take, in seconds. For example, a value of 5 means \"fly to this position over a duration of 5 seconds\" \\param shouldUseUpVector If true, try to use the up-direction when computing the target position for the camera. For globes, this means that North should be up, in relation to the camera's view direction. Note that for this to take effect, rolling motions must be enabled in the Path Navigator settings.
+   */
+  flyToGeo: (node: string, latitude: number, longitude: number, altitude: number, duration?: number, shouldUseUpVector?: boolean) => Promise<void>
+  /**
+   * Fly the camera to a geographic coordinate (latitude and longitude) on a globe, using the path navigation system. If the node is a globe, the longitude and latitude is expressed in the body's native coordinate system. If it is not, the position on the surface of the interaction sphere is used instead.
+
+The distance to fly to can either be set to be the current distance of the camera to the target object, or the default distance from the path navigation system.
+
+\\param node The identifier of a scene graph node. If an empty string is provided, the current anchor node is used \\param latitude The latitude of the target coordinate, in degrees \\param longitude The longitude of the target coordinate, in degrees \\param useCurrentDistance If true, use the current distance of the camera to the target globe when going to the specified position. If false, or not specified, set the distance based on the bounding sphere and the distance factor setting in Path Navigator \\param duration An optional duration for the motion to take, in seconds. For example, a value of 5 means \"fly to this position over a duration of 5 seconds\" \\param shouldUseUpVector If true, try to use the up-direction when computing the target position for the camera. For globes, this means that North should be up, in relation to the camera's view direction. Note that for this to take effect, rolling motions must be enabled in the Path Navigator settings.
+   */
+  flyToGeo2: (node: string, latitude: number, longitude: number, useCurrentDistance?: boolean, duration?: number, shouldUseUpVector?: boolean) => Promise<void>
+  /**
+   * Move the camera to the node with the specified identifier. The second argument is the desired target height above the target node's bounding sphere, in meters. The optional double specifies the duration of the motion, in seconds. If the optional bool is set to true, the target up vector for camera is set based on the target node. Either of the optional parameters can be left out.
+
+\\param nodeIdentifier The identifier of the node to which we want to fly \\param height The height (in meters) to which we want to fly. The way the height is defined specifically determines on the type of node to which the fly-to command is pointed. \\param useUpFromTargetOrDuration If this value is a boolean value (`true` or `false`), this value determines whether we want to end up with the camera facing along the selected node's up direction. If this value is a numerical value, refer to the documnentation of the `duration` parameter \\param duration The duration (in seconds) how long the flying to the selected node should take. If this value is left out, a sensible default value is uses, which can be configured in the engine
+   */
+  flyToHeight: (nodeIdentifier: string, height: number, useUpFromTargetOrDuration?: boolean | number, duration?: number) => Promise<void>
+  /**
+   * Create a path to the navigation state described by the input table. Note that roll must be included for the target up direction in the navigation state to be taken into account.
+
+\\param navigationState A [NavigationState](#core_navigation_state) to fly to \\param duration An optional duration for the motion to take, in seconds. For example, a value of 5 means \"fly to this position over a duration of 5 seconds\"
+   */
+  flyToNavigationState: (navigationState: table, duration?: number) => Promise<void>
+  /**
    * Return the current [NavigationState](#core_navigation_state) as a Lua table.
 
 By default, the reference frame will be picked based on whether the orbital navigator is currently following the anchor node rotation. If it is, the anchor will be chosen as reference frame. If not, the reference frame will be set to the scene graph root.
@@ -1458,6 +1534,12 @@ By default, the reference frame will be picked based on whether the orbital navi
 \\return a Lua table representing the current NavigationState of the camera
    */
   getNavigationState: (frame?: string) => Promise<table>
+  /**
+   * Returns true if a camera path is currently running, and false otherwise.
+
+\\return Whether a camera path is currently active, or not
+   */
+  isFlying: () => Promise<boolean>
   /**
    * Return all the information bound to a certain joystick axis.
 
@@ -1475,6 +1557,26 @@ By default, the reference frame will be picked based on whether the orbital navi
    */
   joystickButton: (joystickName: string, button: integer) => Promise<string>
   /**
+   * Fade rendering to black, jump to the specified navigation state, and then fade in. This is done by triggering another script that handles the logic.
+
+\\param nodeIdentifier The identifier of the scene graph node to jump to \\param fadeDuration An optional duration for the fading. If not included, the property in Navigation Handler will be used
+   */
+  jumpTo: (nodeIdentifier: string, fadeDuration?: number) => Promise<void>
+  /**
+   * Immediately move the camera to a geographic coordinate on a node by first fading the rendering to black, jump to the specified coordinate, and then fade in. If the node is a globe, the longitude and latitude values are expressed in the body's native coordinate system. If it is not, the position on the surface of the interaction sphere is used instead.
+
+This is done by triggering another script that handles the logic.
+
+\\param node The identifier of a scene graph node. If an empty string is provided, the current anchor node is used \\param latitude The latitude of the target coordinate, in degrees \\param longitude The longitude of the target coordinate, in degrees \\param altitude An optional altitude, given in meters over the reference surface of the globe. If no altitude is provided, the altitude will be kept as the current distance to the reference surface of the specified node \\param fadeDuration An optional duration for the fading. If not included, the property in Navigation Handler will be used
+   */
+  jumpToGeo: (node: string, latitude: number, longitude: number, altitude?: number, fadeDuration?: number) => Promise<void>
+  /**
+   * Fade rendering to black, jump to the specified node, and then fade in. This is done by triggering another script that handles the logic.
+
+\\param navigationState A [NavigationState](#core_navigation_state) to jump to. \\param useTimeStamp if true, and the provided NavigationState includes a timestamp, the time will be set as well. \\param fadeDuration An optional duration for the fading. If not included, the property in Navigation Handler will be used.
+   */
+  jumpToNavigationState: (navigationState: table, useTimeStamp?: boolean, fadeDuration?: number) => Promise<void>
+  /**
    * Return the complete list of connected joysticks.
 
 \\return a list of joystick names
@@ -1486,6 +1588,12 @@ By default, the reference frame will be picked based on whether the orbital navi
 \\param filePath the path to the file, including the file name (and extension, if it is anything other than `.navstate`) \\param useTimeStamp if true, and the provided NavigationState includes a timestamp, the time will be set as well.
    */
   loadNavigationState: (filePath: string, useTimeStamp?: boolean) => Promise<void>
+  /**
+   * Returns the position in the local Cartesian coordinate system of the specified node that corresponds to the given geographic coordinates. In the local coordinate system, the position (0,0,0) corresponds to the globe's center. If the node is a globe, the longitude and latitude is expressed in the body's native coordinate system. If it is not, the position on the surface of the interaction sphere is used instead.
+
+\\param nodeIdentifier The identifier of the scene graph node \\param latitude The latitude of the geograpic position, in degrees \\param longitude The longitude of the geographic position, in degrees \\param altitude The altitude, in meters
+   */
+  localPositionFromGeo: (nodeIdentifier: string, latitude: number, longitude: number, altitude: number) => Promise<[number, number, number]>
   /**
    * Reset the camera direction to point at the aim node.
    */
@@ -1509,6 +1617,14 @@ By default, the reference frame will be picked based on whether the orbital navi
    */
   setAxisDeadZone: (joystickName: string, axis: integer, deadzone: number) => Promise<void>
   /**
+   * Set the current focus node for the navigation, or re-focus on it if it was already the focus node.
+
+Per default, the camera will retarget to center the focus node in the view. The velocities will also be reset so that the camera stops moving after any retargeting is done. However, both of these behaviors may be skipped using the optional arguments.
+
+\\param identifier The identifier of the scene graph node to focus \\param shouldRetarget If true, retarget the camera to look at the focus node \\param shouldResetVelocities If true, reset the camera velocities so that the camera stops after its done retargeting (or immediately if retargeting is not done)
+   */
+  setFocus: (identifier: string, shouldRetarget?: boolean, shouldResetVelocities?: boolean) => Promise<void>
+  /**
    * Set the camera position from a provided [NavigationState](#core_navigation_state).
 
 \\param navigationState a table describing the NavigationState to set \\param useTimeStamp if true, and the provided NavigationState includes a timestamp, the time will be set as well
@@ -1526,6 +1642,24 @@ By default, the reference frame will be picked based on whether the orbital navi
    * Immediately start applying the chosen IdleBehavior. If none is specified, use the one set to default in the OrbitalNavigator.
    */
   triggerIdleBehavior: (choice?: string) => Promise<void>
+  /**
+   * Fly linearly to a specific distance in relation to the focus node.
+
+\\param distance The distance to fly to, in meters above the bounding sphere. \\param duration An optional duration for the motion to take, in seconds.
+   */
+  zoomToDistance: (distance: number, duration?: number) => Promise<void>
+  /**
+   * Fly linearly to a specific distance in relation to the focus node, given as a relative value based on the size of the object rather than in meters.
+
+\\param distance The distance to fly to, given as a multiple of the bounding sphere of the current focus node bounding sphere. A value of 1 will result in a position at a distance of one times the size of the bounding sphere away from the object. \\param duration An optional duration for the motion, in seconds.
+   */
+  zoomToDistanceRelative: (distance: number, duration?: number) => Promise<void>
+  /**
+   * Zoom linearly to the current focus node, using the default distance.
+
+\\param duration An optional duration for the motion to take, in seconds. For example, a value of 5 means \"zoom in over 5 seconds\"
+   */
+  zoomToFocus: (duration?: number) => Promise<void>
 } // interface navigationLibrary
 
 interface openglCapabilitiesLibrary {
@@ -1625,38 +1759,6 @@ interface pathnavigationLibrary {
    */
   createPath: (pathInstruction: table) => Promise<void>
   /**
-   * Move the camera to the node with the specified identifier. The optional double specifies the duration of the motion, in seconds. If the optional bool is set to true the target up vector for camera is set based on the target node. Either of the optional parameters can be left out.
-   */
-  flyTo: (nodeIdentifier: string, useUpFromTargetOrDuration?: boolean | number, duration?: number) => Promise<void>
-  /**
-   * Move the camera to the node with the specified identifier. The second argument is the desired target height above the target node's bounding sphere, in meters. The optional double specifies the duration of the motion, in seconds. If the optional bool is set to true, the target up vector for camera is set based on the target node. Either of the optional parameters can be left out.
-   */
-  flyToHeight: (nodeIdentifier: string, height: number, useUpFromTargetOrDuration?: boolean | number, duration?: number) => Promise<void>
-  /**
-   * Create a path to the navigation state described by the input table. Note that roll must be included for the target up direction in the navigation state to be taken into account.
-
-\\param navigationState A [NavigationState](#core_navigation_state) to fly to \\param duration An optional duration for the motion to take, in seconds. For example, a value of 5 means \"fly to this position over a duration of 5 seconds\"
-   */
-  flyToNavigationState: (navigationState: table, duration?: number) => Promise<void>
-  /**
-   * Returns true if a camera path is currently running, and false otherwise.
-
-\\return Whether a camera path is currently active, or not
-   */
-  isFlying: () => Promise<boolean>
-  /**
-   * Fade rendering to black, jump to the specified navigation state, and then fade in. This is done by triggering another script that handles the logic.
-
-\\param nodeIdentifier The identifier of the scene graph node to jump to \\param fadeDuration An optional duration for the fading. If not included, the property in Navigation Handler will be used
-   */
-  jumpTo: (nodeIdentifier: string, fadeDuration?: number) => Promise<void>
-  /**
-   * Fade rendering to black, jump to the specified node, and then fade in. This is done by triggering another script that handles the logic.
-
-\\param navigationState A [NavigationState](#core_navigation_state) to jump to. \\param useTimeStamp if true, and the provided NavigationState includes a timestamp, the time will be set as well. \\param fadeDuration An optional duration for the fading. If not included, the property in Navigation Handler will be used.
-   */
-  jumpToNavigationState: (navigationState: table, useTimeStamp?: boolean, fadeDuration?: number) => Promise<void>
-  /**
    * Pause a playing camera path.
    */
   pausePath: () => Promise<void>
@@ -1668,24 +1770,6 @@ interface pathnavigationLibrary {
    * Stops a path, if one is being played.
    */
   stopPath: () => Promise<void>
-  /**
-   * Fly linearly to a specific distance in relation to the focus node.
-
-\\param distance The distance to fly to, in meters above the bounding sphere. \\param duration An optional duration for the motion to take, in seconds.
-   */
-  zoomToDistance: (distance: number, duration?: number) => Promise<void>
-  /**
-   * Fly linearly to a specific distance in relation to the focus node, given as a relative value based on the size of the object rather than in meters.
-
-\\param distance The distance to fly to, given as a multiple of the bounding sphere of the current focus node bounding sphere. A value of 1 will result in a position at a distance of one times the size of the bounding sphere away from the object. \\param duration An optional duration for the motion, in seconds.
-   */
-  zoomToDistanceRelative: (distance: number, duration?: number) => Promise<void>
-  /**
-   * Zoom linearly to the current focus node, using the default distance.
-
-\\param duration An optional duration for the motion to take, in seconds. For example, a value of 5 means \"zoom in over 5 seconds\"
-   */
-  zoomToFocus: (duration?: number) => Promise<void>
 } // interface pathnavigationLibrary
 
 interface scriptSchedulerLibrary {
@@ -1771,18 +1855,6 @@ interface skybrowserLibrary {
    * Finetunes the target depending on a mouse drag. rendered copy to it. First argument is the identifier of the sky browser, second is the start position of the drag and third is the end position of the drag.
    */
   finetuneTargetPosition: (identifier: string, translation: vec2) => Promise<void>
-  /**
-   * Deprecated in favor of 'listOfExoplanets'
-   */
-  getListOfImages: () => Promise<table>
-  /**
-   * Deprecated in favor of 'targetData'
-   */
-  getTargetData: () => Promise<table>
-  /**
-   * Deprecated in favor of 'wwtImageCollectionUrl'
-   */
-  getWwtImageCollectionUrl: () => Promise<table>
   /**
    * Takes an identifier to a sky browser and starts the initialization for that browser. That means that the browser starts to try to connect to the AAS WorldWide Telescope application by sending it messages. And that the target matches its appearance to its corresponding browser.
    */
