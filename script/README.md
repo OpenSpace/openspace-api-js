@@ -6,7 +6,7 @@ This folder contains a helper Python script that generates a TypeScript declarat
 
 Instead of publishing the `openspace-api-js.d.ts` file to the @types namespace on npm or the DefinitelyTyped repository, we keep it in this repository. Since the OpenSpace Lua API updates frequently, maintaining control over the TypeScript declaration file ensures that changes can be reflected quickly without going through a lengthy approval process.
 
-# Usage
+# Usage in TypeScrip Projects
 
 1.  Copy the `openspace-api-js.d.ts` file from the `declaration` folder to your project's `src` folder.
 2.  Ensure that your TypeScript configuration (`tsconfig.json`) includes the copied `.d.ts`file in `compilerOptions`, if necessary.
@@ -40,36 +40,11 @@ python generatetypescriptfile.py
 
 # Prerequisites
 
-- Python >= 3.8
+- Python >= 3.12
 - The OpenSpace Python API is required, see [repository](https://github.com/OpenSpace/openspace-api-python) for further details.
 - Dependencies must be installed using the provided `requirements.txt` file.
 - OpenSpace must be running when executing the script
 
 # Caveats
-
-- As of 2025-03-05 the functions `propertyValue` and `setPropertyValueSingle` do not retrieve their correct function signatures from OpenSpace due to their implementation in C++. To call these functions correctly from a TypeScript context, their type definitions must be manually adjusted:
-- Change:
-
-  ```javascript
-  propertyValue: () => Promise<void>
-  ```
-
-- To
-
-  ```javascript
-  propertyValue: (uri: string) => Promise<unknown>
-  ```
-
-- Change:
-
-  ```javascript
-  setPropertyValueSingle: () => Promise<void>
-  ```
-
-- To:
-
-  ```javascript
-  setPropertyValuesingle: (uri: string, value: any, duration?: number, easingFunction?: string, script?: string) => Promise<void>
-  ```
 
 - File Updates: Keep in mind that the TypeScript declaration file in this repository may not be updated at the same rate as the OpenSpace project itself. Therefore, you might encounter discrepancies between the API definitions here and the latest version of OpenSpace.
