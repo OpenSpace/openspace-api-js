@@ -96,8 +96,14 @@ def writeCustomTypes(file):
     file.write("type integer = number;\n")
     file.write("type vec2 = [number, number];\n")
     file.write("type vec3 = [number, number, number];\n")
+    file.write("type vec4 = [number, number, number, number];\n")
+    file.write("type mat2x2 = { 1: number; 2: number; 3: number; 4: number; };\n")
     file.write("type mat3x3 = { 1: number; 2: number; 3: number; 4: number; 5: number;" +
                "6: number; 7: number; 8: number; 9: number; };\n"
+    )
+    file.write("type mat4x4 = { 1: number; 2: number; 3: number; 4: number; 5: number;" +
+               "6: number; 7: number; 8: number; 9: number; 10: number; 11: number;" +
+               "12: number; 13: number; 14: number; 15: number; 16: number; };\n"
     )
     file.write("type translation = object;\n")
     file.write("type spicekernel = path;\n")
