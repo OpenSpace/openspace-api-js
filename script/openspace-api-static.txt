@@ -1,0 +1,211 @@
+/*****************************************************************************************
+ *                                                                                       *
+ * OpenSpace-api-js                                                                      *
+ *                                                                                       *
+ * Copyright (c) 2024-2025                                                               *
+ *                                                                                       *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
+ * software and associated documentation files (the "Software"), to deal in the Software *
+ * without restriction, including without limitation the rights to use, copy, modify,    *
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
+ * permit persons to whom the Software is furnished to do so, subject to the following   *
+ * conditions:                                                                           *
+ *                                                                                       *
+ * The above copyright notice and this permission notice shall be included in all copies *
+ * or substantial portions of the Software.                                              *
+ *                                                                                       *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
+ ****************************************************************************************/
+
+declare module 'openspace-api-js' {
+  export class OpenSpaceApi {
+    /**
+     * Construct an instance of the OpenSpace API.
+     * @param socket An instance of Socket or WebSocket.
+     *               The socket should not be connected prior to calling this constructor.
+     */
+    constructor(socket: SocketWrapper | WebSocketWrapper);
+
+    /**
+     * Set connect callback.
+     * @param callback The function to execute when connection is established.
+     */
+    onConnect(callback: () => void): void;
+
+    /**
+     * Set disconnect callback.
+     * @param callback The function to execute when socket is disconnected.
+     */
+    onDisconnect(callback: () => void): void;
+
+    /**
+     * Connect to OpenSpace.
+     */
+    connect(): void;
+
+    /**
+     * Disconnect from OpenSpace.
+     */
+    disconnect(): void;
+
+    /**
+     * Initialize a new channel of communication
+     * @param type A string specifying the type of topic to construct.
+     *             See OpenSpace's server module for available topic types.
+     * @param payload The JavaScript object to send. Must be possible to encode to JSON.
+     *
+     * @return An object representing the topic.
+     */
+    startTopic(type: string, payload: object): Topic;
+
+    /**
+     * Authenticate this client.
+     * This must be done if the client is not whitelisted in openspace.cfg.
+     * @param secret The secret used to authenticate with OpenSpace.
+     *
+     * @return An object promise whether user was succesfully authorized.
+     */
+    authenticate(secret: string): Promise<object>;
+
+    /**
+     * Set a property
+     * @param property The URI of the property to set.
+     * @param value - The value to set the property to.
+     */
+    setProperty(property: string, value: unknown): void;
+
+    /**
+     * Get a property
+     * @param property The URI of the property to set.
+     *
+     * @return The value of the property.
+     */
+    getProperty(property: string): Promise<unknown>;
+
+    /**
+     * Get a documentation object
+     * @param type The type of documentation to get.
+     *              For available types, check documentationtopic.cpp in OpenSpace's
+     *              server module.
+     *
+     * @return An object representing the requested documentation.
+     */
+    getDocumentation(type: string): Promise<object>;
+
+    /**
+     * Subscribe to a property
+     * @param property The URI of the property.
+     *
+     * @return A topic object to represent the subscription topic.
+     *         When cancelled, this object will unsubscribe to the property.
+     */
+    subscribeToProperty(property: string): Topic;
+
+    /**
+     * Execute a lua script
+     * @param script The lua script to execute.
+     * @param getReturnValue Specified whether the return value should be collected.
+     * @param houldBeSynchronized Specified whether the script should be synchronized on a
+     *                            cluster
+     * @return The return value of the script, if `getReturnValue` is true, otherwise
+     *         undefined.
+     */
+    executeLuaScript(
+      script: string,
+      getReturnValue: boolean,
+      shouldBeSynchronized: boolean
+    ): Promise<unknown | undefined>;
+
+    /**
+     * Execute a lua function from the OpenSpace library
+     * @param function The lua function to execute (for example
+     *                 `openspace.addSceneGraphNode`).
+     * @param getReturnValue Specified whether the return value should be collected.
+     *
+     * @return The return value of the script, if `getReturnValue` is true, otherwise
+     *         undefined.
+     */
+    executeLuaFunction(
+      fun: string,
+      getReturnValue: boolean
+    ): Promise<unknown | undefined>;
+
+    /**
+     * Get an object representing the OpenSpace lua library.
+     * @param MultiReturn Whether the library should return the raw lua tables.
+     *                    If this value is true, the 1-indexed lua table will be returned
+     *                    as a JavaScript object. If the value is false, then only the
+     *                    first return value will be returned
+     *
+     * @return The lua library, mapped to async JavaScript functions.
+     */
+    library(multireturn?: boolean | undefined): Promise<OpenSpace.openspace>;
+
+    /**
+     * Get an object representing the OpenSpace lua library.
+     * @return The lua library, mapped to async JavaScript functions.
+     *         This method only returns the first return value.
+     */
+    singleReturnLibrary(): Promise<OpenSpace.openspace>;
+
+    /**
+     * Get an object representing the OpenSpace lua library.
+     * @return The lua library, mapped to async JavaScript functions.
+     *         The values returned by the async functions will be the entire lua tables,
+     *         with 1-indexed values.
+     */
+    multiReturnLibrary(): Promise<OpenSpace.openspace>;
+  }
+
+  export class SocketWrapper {
+    /** Internal usage only */
+    constructor(address: string, port: number);
+    onConnect(cb: () => void): void;
+    onDisconnect(cb: () => void): void;
+    onMessage(cb: (message: string) => void): void;
+    connect(): void;
+    send(message: any): void;
+    disconnect(): void;
+  }
+
+  export class WebSocketWrapper {
+    /** Internal usage only */
+    constructor(address: string, port: number);
+    onConnect(cb: () => void): void;
+    onDisconnect(cb: () => void): void;
+    onMessage(cb: (message: string) => void): void;
+    connect(): void;
+    send(message: any): void;
+    disconnect(): void;
+  }
+
+  export class Topic {
+    /** Internal usage only */
+    constructor(
+      iterator: AsyncGenerator<any, void, unknown>,
+      talk: (payload: any) => void,
+      cancel: () => void
+    );
+    /**
+     * Send data within a topic
+     * @param {object} data - The JavaScript object to send.
+     *        Must be possible to encode into JSON.
+     */
+    talk(data: any): void;
+    /**
+     * Get the async iterator used to get data from OpenSpace.
+     */
+    iterator(): AsyncGenerator<any, void, unknown>;
+    /**
+     * Cancel the topic.
+     */
+    cancel(): void;
+  }
+
+  export default function (host: string, port: number): OpenSpaceApi;
+} // module OpenSpaceApi
