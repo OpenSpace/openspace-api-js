@@ -2,7 +2,7 @@
  *                                                                                       *
  * OpenSpace-api-js                                                                      *
  *                                                                                       *
- * Copyright (c) 2024-2024                                                               *
+ * Copyright (c) 2024-2025                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -219,7 +219,10 @@ type custompropertytype = any;
 type integer = number;
 type vec2 = [number, number];
 type vec3 = [number, number, number];
+type vec4 = [number, number, number, number];
+type mat2x2 = { 1: number; 2: number; 3: number; 4: number; };
 type mat3x3 = { 1: number; 2: number; 3: number; 4: number; 5: number;6: number; 7: number; 8: number; 9: number; };
+type mat4x4 = { 1: number; 2: number; 3: number; 4: number; 5: number;6: number; 7: number; 8: number; 9: number; 10: number; 11: number;12: number; 13: number; 14: number; 15: number; 16: number; };
 type translation = object;
 type spicekernel = path;
 
@@ -390,9 +393,15 @@ export interface openspace {
    */
   isMaster: () => Promise<boolean>
   /**
-   * Returns the strings of the script that are bound to the passed key and whether they were local or remote key binds.
+   * Returns the identifiers of the action that are bound to the passed key and whether they were local or remote key binds. If no key is provided, all bound keybindings are returned instead.
+
+\\param key The key for which to return the keybindings. If no key is provided, all keybindings are returned
    */
-  keyBindings: (key: string) => Promise<string[]>
+  keyBindings: (key?: string) => Promise<string[]>
+  /**
+   * Returns the keybinds to which the provided action is bound. As actions can be bound to multiple keys, this function returns a list of all keys
+   */
+  keyBindingsForAction: (action: string) => Promise<string[]>
   /**
    * Returns the current layer server from the configuration
    */
@@ -449,11 +458,25 @@ export interface openspace {
    */
   printWarning: (...args: any[]) => Promise<void>
   /**
-   * Returns a list of property identifiers that match the passed regular expression. The `uri` identifies the property or properties that are returned by this function and can include both wildcards `*` which match anything, as well as tags (`{tag}`) which match scene graph nodes that have this tag. There is also the ability to combine two tags through the `&`, `|`, and `~` operators. `{tag1&tag2}` will match anything that has the tag1 and the tag2. `{tag1|tag2}` will match anything that has the tag1 or the tag 2, and `{tag1~tag2}` will match anything that has tag1 but not tag2. If no wildcards or tags are provided at most one property value will be changed. With wildcards or tags all properties that match the URI are changed instead.
+   * Returns the name of the profile with which OpenSpace was started.
+   */
+  profileName: () => Promise<string>
+  /**
+   * Returns the full path of the profile with which OpenSpace was started.
+   */
+  profilePath: () => Promise<path>
+  /**
+   * Returns a list of property identifiers that match the passed regular expression. The `uri` identifies the property or properties that are returned by this function and can include both wildcards `*` which match anything, as well as tags (`{tag}`) which match scene graph nodes that have this tag. There is also the ability to combine two tags through the `&`, `|`, and `~` operators. `{tag1&tag2}` will match anything that has both tags `tag1` and `tag2`. `{tag1|tag2}` will match anything that has `tag1` or `tag2`, and `{tag1~tag2}` will match anything that has `tag1` but not `tag2`. If no wildcards or tags are provided at most one property identifier will be returned. With wildcards or tags, the identifiers of all properties that match the URI are returned instead.
 
-\\param uri The URI that identifies the property or properties whose values should be changed. The URI can contain 0 or 1 wildcard `*` characters or a tag expression (`{tag}`) that identifies a property owner.
+\\param uri The URI that identifies the property or properties to get. The URI can contain 0 or 1 wildcard `*` characters or a tag expression (`{tag}`) that identifies a property owner. \\ return A list of property URIs
    */
   property: (uri: string) => Promise<string[]>
+  /**
+   * Returns a list of property owner identifiers that match the passed regular expression. The `uri` identifies the property owner or owner that are returned by this function and can include both wildcards `*` which match anything, as well as tags (`{tag}`) which match scene graph nodes that have this tag. There is also the ability to combine two tags through the `&`, `|`, and `~` operators. `{tag1&tag2}` will match anything that has both tags `tag1` and `tag2`. `{tag1|tag2}` will match anything that has the tag `tag1` or `tag2`, * and `{tag1~tag2}` will match anything that has `tag1` but not `tag2`. If no wildcards or tags are provided at most one property owner identifier will be returned. With wildcards or tags, the identifiers of all property owners that match the URI are returned instead.
+
+\\param uri The URI that identifies the property owner or owners to get. The URI can contain 0 or 1 wildcard `*` characters or a tag expression (`{tag}`) that identifies a property owner. \\ return A list of property owner URIs
+   */
+  propertyOwner: (uri: string) => Promise<string[]>
   /**
    * Returns the value of the property identified by the provided URI. This function will provide an error message if no property matching the URI is found.
    */
@@ -524,6 +547,12 @@ export interface openspace {
    * Returns the target path for a Windows shortcut file. This function will produce an error on non-Windows operating systems. The `path` has to be a valid Windows Shell link file.
    */
   resolveShortcut: (path: path) => Promise<path>
+  /**
+   * This function takes a base64 encoded data string, decodes it and saves the resulting data to the provided filepath.
+
+\\param filePath The location where the data will be saved. Any file that already exists in that location will be overwritten \\param base64Data The base64 encoded data that should be saved to the provided file
+   */
+  saveBase64File: (filepath: path, base64Data: string) => Promise<void>
   /**
    * Collects all changes that have been made since startup, including all property changes and assets required, requested, or removed. All changes will be added to the profile that OpenSpace was started with, and the new saved file will contain all of this information. If the argument is provided, the settings will be saved into new profile with that name. If the argument is blank, the current profile will be saved to a backup file and the original profile will be overwritten. The second argument determines if a file that already exists should be overwritten, which is 'false' by default.
    */
@@ -1041,7 +1070,7 @@ The format and column names in the CSV should be the same as the ones provided b
 
 When dowloading the data from the archive we recommend including all columns, since a few required ones are not selected by default.
 
-\\param csvFile A path to the CSV file to load the data from.
+\\param csvFile A path to the CSV file to load the data from
 
 \\return A list of objects of the type [ExoplanetSystemData](#exoplanets_exoplanet_system_data), that can be used to create the scene graph nodes for the exoplanet systems
    */
@@ -1049,13 +1078,13 @@ When dowloading the data from the archive we recommend including all columns, si
   /**
    * Remove a loaded exoplanet system.
 
-\\param starName The name of the host star for the system to remove.
+\\param starName The name of the host star for the system to remove
    */
   removeExoplanetSystem: (starName: string) => Promise<void>
   /**
    * Return an object containing the information needed to add a specific exoplanet system. The data is retrieved from the module's prepared datafile for exoplanets. This file is in a binary format, for fast retrieval during runtime.
 
-\\param starName The name of the star to get the information for.
+\\param starName The name of the star to get the information for
 
 \\return An object of the type [ExoplanetSystemData](#exoplanets_exoplanet_system_data) that can be used to create the scene graph nodes for the exoplanet system
    */
@@ -1571,7 +1600,7 @@ This is done by triggering another script that handles the logic.
   /**
    * Fade rendering to black, jump to the specified node, and then fade in. This is done by triggering another script that handles the logic.
 
-\\param navigationState A [NavigationState](#core_navigation_state) to jump to. \\param useTimeStamp if true, and the provided NavigationState includes a timestamp, the time will be set as well. \\param fadeDuration An optional duration for the fading. If not included, the property in Navigation Handler will be used.
+\\param navigationState A [NavigationState](#core_navigation_state) to jump to \\param useTimeStamp if true, and the provided NavigationState includes a timestamp, the time will be set as well \\param fadeDuration An optional duration for the fading. If not included, the property in Navigation Handler will be used
    */
   jumpToNavigationState: (navigationState: table, useTimeStamp?: boolean, fadeDuration?: number) => Promise<void>
   /**
@@ -1643,13 +1672,13 @@ Per default, the camera will retarget to center the focus node in the view. The 
   /**
    * Fly linearly to a specific distance in relation to the focus node.
 
-\\param distance The distance to fly to, in meters above the bounding sphere. \\param duration An optional duration for the motion to take, in seconds.
+\\param distance The distance to fly to, in meters above the bounding sphere \\param duration An optional duration for the motion to take, in seconds
    */
   zoomToDistance: (distance: number, duration?: number) => Promise<void>
   /**
    * Fly linearly to a specific distance in relation to the focus node, given as a relative value based on the size of the object rather than in meters.
 
-\\param distance The distance to fly to, given as a multiple of the bounding sphere of the current focus node bounding sphere. A value of 1 will result in a position at a distance of one times the size of the bounding sphere away from the object. \\param duration An optional duration for the motion, in seconds.
+\\param distance The distance to fly to, given as a multiple of the bounding sphere of the current focus node bounding sphere. A value of 1 will result in a position at a distance of one times the size of the bounding sphere away from the object \\param duration An optional duration for the motion, in seconds
    */
   zoomToDistanceRelative: (distance: number, duration?: number) => Promise<void>
   /**
@@ -1803,9 +1832,9 @@ interface sessionRecordingLibrary {
    */
   setPlaybackPause: (pause: boolean) => Promise<void>
   /**
-   * Starts a playback session with keyframe times that are relative to the time since the recording was started (the same relative time applies to the playback). When playback starts, the simulation time is automatically set to what it was at recording time. The string argument is the filename to pull playback keyframes from (the file path is relative to the RECORDINGS variable specified in the config file). If a second input value of true is given, then playback will continually loop until it is manually stopped.
+   * Starts a playback session with keyframe times that are relative to the time since the recording was started (the same relative time applies to the playback). When playback starts, the simulation time is automatically set to what it was at recording time. The file argument is the filename to the session recording file. If a second input value of true is given, then playback will continually loop until it is manually stopped.
    */
-  startPlayback: (file: string, loop?: boolean, shouldWaitForTiles?: boolean, screenshotFps?: integer) => Promise<void>
+  startPlayback: (file: path, loop?: boolean, shouldWaitForTiles?: boolean, screenshotFps?: integer) => Promise<void>
   /**
    * Starts a recording session. The string argument is the filename used for the file where the recorded keyframes are saved.
    */
