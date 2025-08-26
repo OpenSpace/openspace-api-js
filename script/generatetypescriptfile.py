@@ -34,6 +34,10 @@ def getArgument(argument):
     parameterName = "...args"
     parameterType = "any[]"
 
+  # Convert 'nil' type to 'null' type
+  if "nil" in parameterType.lower():
+    parameterType = re.sub(r'nil', 'null', parameterType, flags=re.IGNORECASE)
+
   return f"{parameterName}: {parameterType.lower()}"
 
 def writeFunctionArguments(file, fun):
@@ -107,6 +111,13 @@ def writeCustomTypes(file):
   )
   file.write("type translation = object;\n")
   file.write("type spicekernel = path;\n")
+  file.write('type easingfunction = "Linear" | "QuadraticEaseIn" | "QuadraticEaseOut" |' +
+             '"QuadraticEaseInOut" | "CubicEaseIn" | "CubicEaseOut" | "CubicEaseInOut"|' +
+             '"QuarticEaseIn" | "QuarticEaseOut" | "QuarticEaseInOut" | "QuinticEaseIn" |' +
+             '"QuinticEaseOut" | "QuinticEaseInOut" | "SineEaseIn" | "SineEaseOut" | "SineEaseInOut" |' +
+             '"CircularEaseIn" | "CircularEaseOut" | "CircularEaseInOut" | "ExponentialEaseIn" | ' +
+             '"ExponentialEaseOut" | "ExponentialEaseInOut" | "ElasticEaseIn" | "ElasticEaseOut" |' +
+             '"ElasticEaseInOut" | "BounceEaseIn" | "BounceEaseOut" | "BounceEaseInOut"\n')
 
   file.write("\n")
 
@@ -137,7 +148,7 @@ async def main():
   api = openspace.Api("localhost", 4681)
 
   try:
-    api.connect()
+    await api.connect()
   except:
     return
 

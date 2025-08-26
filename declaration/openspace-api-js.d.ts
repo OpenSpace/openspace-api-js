@@ -225,6 +225,7 @@ type mat3x3 = { 1: number; 2: number; 3: number; 4: number; 5: number;6: number;
 type mat4x4 = { 1: number; 2: number; 3: number; 4: number; 5: number;6: number; 7: number; 8: number; 9: number; 10: number; 11: number;12: number; 13: number; 14: number; 15: number; 16: number; };
 type translation = object;
 type spicekernel = path;
+type easingfunction = "Linear" | "QuadraticEaseIn" | "QuadraticEaseOut" |"QuadraticEaseInOut" | "CubicEaseIn" | "CubicEaseOut" | "CubicEaseInOut"|"QuarticEaseIn" | "QuarticEaseOut" | "QuarticEaseInOut" | "QuinticEaseIn" |"QuinticEaseOut" | "QuinticEaseInOut" | "SineEaseIn" | "SineEaseOut" | "SineEaseInOut" |"CircularEaseIn" | "CircularEaseOut" | "CircularEaseInOut" | "ExponentialEaseIn" | "ExponentialEaseOut" | "ExponentialEaseInOut" | "ElasticEaseIn" | "ElasticEaseOut" |"ElasticEaseInOut" | "BounceEaseIn" | "BounceEaseOut" | "BounceEaseInOut"
 
 export interface openspace {
   action: actionLibrary;
@@ -639,7 +640,7 @@ in which the parameter is interpolated. Has to be one of "Linear", "QuadraticEas
 is completed. If a duration larger than 0 was provided, it is at the end of the
 interpolation. If 0 was provided, the script runs immediately.
    */
-  setPropertyValue: (uri: string, value: nil | string | number | boolean | table, duration?: number, easing?: easingfunction, postscript?: string) => Promise<void>
+  setPropertyValue: (uri: string, value: null | string | number | boolean | table, duration?: number, easing?: easingfunction, postscript?: string) => Promise<void>
   /**
    * Sets the single property identified by the URI to the specified value.
 The `uri` identifies which property is affected by this function call. The second
@@ -668,7 +669,7 @@ in which the parameter is interpolated. Has to be one of "Linear", "QuadraticEas
 change of property value is completed. If a duration larger than 0 was provided, it is
 at the end of the interpolation. If 0 was provided, the script runs immediately.
    */
-  setPropertyValueSingle: (uri: string, value: nil | string | number | boolean | table, duration?: number, easing?: easingfunction, postscript?: string) => Promise<void>
+  setPropertyValueSingle: (uri: string, value: null | string | number | boolean | table, duration?: number, easing?: easingfunction, postscript?: string) => Promise<void>
   /**
    * Sets the folder used for storing screenshots or session recording frames
    */
