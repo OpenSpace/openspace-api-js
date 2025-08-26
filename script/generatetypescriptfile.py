@@ -21,7 +21,7 @@ def getArgument(argument):
   parameterName = argument["name"]
   parameterType = argument["type"]
 
-  # If a parameter is optional its marked with a '?' after the parameter type.
+  # If a parameter is optional it's marked with a '?' after the parameter type.
   # Typescript requires the '?' to denote an optional parameter on the name rather than
   # the type
   if "?" in parameterType:

@@ -6,7 +6,7 @@ This folder contains a helper Python script that generates a TypeScript declarat
 
 Instead of publishing the `openspace-api-js.d.ts` file to the @types namespace on npm or the DefinitelyTyped repository, we keep it in this repository. Since the OpenSpace Lua API updates frequently, maintaining control over the TypeScript declaration file ensures that changes can be reflected quickly without going through a lengthy approval process.
 
-# Usage in TypeScrip Projects
+# Usage in TypeScript Projects
 
 1.  Copy the `openspace-api-js.d.ts` file from the `declaration` folder to your project's `src` folder.
 2.  Ensure that your TypeScript configuration (`tsconfig.json`) includes the copied `.d.ts`file in `compilerOptions`, if necessary.
