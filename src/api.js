@@ -65,7 +65,7 @@ class OpenSpaceApi {
    */
   startTopic(type, payload) {
     if (typeof type !== 'string') {
-      throw("Topic type must be a string")
+      throw "Topic type must be a string";
     }
 
     const topic = this._nextTopicId++;
@@ -132,16 +132,24 @@ class OpenSpaceApi {
    * @param {string} property - The URI of the property to set.
    * @param {*} value - The value to set the property to.
    */
-  setProperty(property, value) {
+  async setProperty(property, value) {
     if (typeof property !== 'string') {
-      throw("Property must be a valid uri string")
+      throw "Property must be a valid uri string";
     }
     const topic = this.startTopic('set', {
-       property,
-       value
-     });
-     topic.cancel();
+      property,
+      value,
+    });
+    try {
+      const response = await topic.iterator().next();
+      topic.cancel();
+      return response.value;
+    } catch (e) {
+      throw "Error setting property. \n" + e;
+    }
   }
+
+
 
   /**
    * Get a property
@@ -150,7 +158,7 @@ class OpenSpaceApi {
    */
   async getProperty(property) {
     if (typeof property !== 'string') {
-      throw("Property must be a valid uri string")
+      throw "Property must be a valid uri string";
     }
     const topic = this.startTopic('get', {
       property,
@@ -193,7 +201,7 @@ class OpenSpaceApi {
    */
   subscribeToProperty(property) {
     if (typeof property !== 'string') {
-      throw("Property must be a valid uri string")
+      throw "Property must be a valid uri string";
     }
     const topic = this.startTopic('subscribe', {
       event: 'start_subscription',
@@ -221,7 +229,7 @@ class OpenSpaceApi {
    */
   async executeLuaScript(script, getReturnValue = true, shouldBeSynchronized = true) {
     if (typeof script !== 'string') {
-      throw("Script must be a string")
+      throw "Script must be a string";
     }
     const topic = this.startTopic('luascript', {
       script,
@@ -250,7 +258,7 @@ class OpenSpaceApi {
    */
   async executeLuaFunction(fun, args, getReturnValue = true) {
     if (typeof fun !== 'string') {
-      throw("Function must be a string")
+      throw "Function must be a string";
     }
     const topic = this.startTopic('luascript', {
       function: fun,
@@ -264,7 +272,7 @@ class OpenSpaceApi {
         topic.cancel();
         return response.value;
       } catch (e) {
-        throw "Error executing lua function: \n" + e
+        throw "Error executing lua function: \n" + e;
       }
     } else {
       topic.cancel();
@@ -287,7 +295,7 @@ class OpenSpaceApi {
         try {
           return await this.executeLuaFunction(functionName, args);
         } catch (e) {
-          throw "Lua execution error: \n" + e
+          throw "Lua execution error: \n" + e;
         }
       }
     };
@@ -301,7 +309,7 @@ class OpenSpaceApi {
           }
           return null;
         } catch (e) {
-          throw "Lua execution error: \n" + e
+          throw "Lua execution error: \n" + e;
         }
       }
     };
