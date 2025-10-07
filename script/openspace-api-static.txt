@@ -22,7 +22,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-declare module 'openspace-api-js' {
+declare module "openspace-api-js" {
   export class OpenSpaceApi {
     /**
      * Construct an instance of the OpenSpace API.
@@ -118,13 +118,14 @@ declare module 'openspace-api-js' {
     executeLuaScript(
       script: string,
       getReturnValue: boolean,
-      shouldBeSynchronized: boolean
+      shouldBeSynchronized: boolean,
     ): Promise<unknown | undefined>;
 
     /**
      * Execute a lua function from the OpenSpace library
      * @param function The lua function to execute (for example
      *                 `openspace.addSceneGraphNode`).
+     * @param args The function arguments.
      * @param getReturnValue Specified whether the return value should be collected.
      *
      * @return The return value of the script, if `getReturnValue` is true, otherwise
@@ -132,7 +133,8 @@ declare module 'openspace-api-js' {
      */
     executeLuaFunction(
       fun: string,
-      getReturnValue: boolean
+      args: unknown[],
+      getReturnValue: boolean,
     ): Promise<unknown | undefined>;
 
     /**
@@ -189,7 +191,7 @@ declare module 'openspace-api-js' {
     constructor(
       iterator: AsyncGenerator<any, void, unknown>,
       talk: (payload: any) => void,
-      cancel: () => void
+      cancel: () => void,
     );
     /**
      * Send data within a topic
