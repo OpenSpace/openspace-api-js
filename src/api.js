@@ -245,6 +245,7 @@ class OpenSpaceApi {
   /**
    * Execute a lua function from the OpenSpace library
    * @param {string} function - The lua function to execute (for example `openspace.addSceneGraphNode`).
+   * @param {*[]} args - The function arguments.
    * @param {string} getReturnValue - Specified whether the return value should be collected.
    * @return {*} The return value of the script, if `getReturnValue` is true, otherwise undefined.
    */
