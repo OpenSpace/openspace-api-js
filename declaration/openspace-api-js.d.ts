@@ -77,7 +77,7 @@ declare module 'openspace-api-js' {
      * @param property The URI of the property to set.
      * @param value - The value to set the property to.
      */
-    setProperty(property: string, value: unknown): void;
+    setProperty(property: string, value: unknown): Promise<void>;
 
     /**
      * Get a property
