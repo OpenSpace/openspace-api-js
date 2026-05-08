@@ -7,7 +7,7 @@
 export interface SessionRecordingTopic {
   data: {
     files?: string[];
-    state?: SessionState;
+    state?: SessionRecordingState;
   };
   topicId: 'sessionRecording';
   topicPayload:
@@ -20,7 +20,7 @@ export interface SessionRecordingTopic {
       };
 }
 
-export const enum SessionState {
+export enum SessionRecordingState {
   Idle = 'idle',
   Recording = 'recording',
   Playing = 'playing',

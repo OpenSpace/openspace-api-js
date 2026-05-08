@@ -1,7 +1,7 @@
 import { ISocket } from './types/types';
 import net from 'net';
 
-export class SocketWrapper implements ISocket {
+export class Socket implements ISocket {
   constructor(address: string, port: number) {
     this._address = address;
     this._port = port;
@@ -56,6 +56,7 @@ export class SocketWrapper implements ISocket {
       return;
     }
     this._client.destroy();
+    this._onDisconnect();
     this._client = null;
   }
 

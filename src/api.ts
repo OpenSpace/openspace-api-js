@@ -10,7 +10,8 @@ import {
 import { OpenSpaceLibrary } from './types/generated/openspacelualibrary';
 import {
   ISocket,
-  NarrowedSubscriptionData,
+  NarrowedGetPropertyTopicData,
+  NarrowedSubscriptionTopicData,
   NarrowedSubscriptionTopic,
   OpenSpaceData,
   PropertyMetaData,
@@ -32,8 +33,8 @@ export class OpenSpaceApi {
   /**
    * Construct an instance of the OpenSpace API.
    *
-   * @param socket - An instance of Socket or WebSocket.
-   *        The socket should not be connected prior to calling this constructor.
+   * @param socket - An instance of Socket or WebSocket. The socket should not be
+   * connected prior to calling this constructor.
    */
   constructor(socket: ISocket) {
     socket.onMessage((message) => {
@@ -171,7 +172,7 @@ export class OpenSpaceApi {
   }
 
   /**
-   * Set a property
+   * Set the property value.
    *
    * @param property - The URI of the property to set.
    * @param  value - The value to set the property to.
@@ -185,15 +186,36 @@ export class OpenSpaceApi {
   }
 
   /**
-   * Get a property or property owner
+   * Get a property or property owner.
    *
    * @param property - The URI of the property to get.
-   * @return The value of the property or property owner
+   * @return The value of the property or property owner.
    */
-  async getProperty(property: string): Promise<TopicData<'get'>> {
+  async getProperty(property: string): Promise<TopicData<'get'>>;
+  async getProperty<T extends PropertyTypes>(
+    property: string,
+    expectedType: T
+  ): Promise<NarrowedGetPropertyTopicData<T>>;
+  async getProperty<T extends PropertyTypes>(
+    property: string,
+    expectedType?: T
+  ): Promise<TopicData<'get'> | NarrowedGetPropertyTopicData<T>> {
     const topic = this.startTopic('get', { property });
     try {
-      return await topic.next();
+      const data = await topic.next();
+      if (expectedType === undefined) {
+        return data;
+      }
+
+      if (data.type === 'property') {
+        const propertyType = data.value.metaData.type;
+        if (propertyType !== expectedType) {
+          throw new Error(
+            `Expected: '${expectedType}' but property '${property}' is of type '${propertyType}'`
+          );
+        }
+      }
+      return data as NarrowedGetPropertyTopicData<T>;
     } catch (e) {
       throw new Error(`Error getting property. ${e}\n`);
     } finally {
@@ -202,7 +224,7 @@ export class OpenSpaceApi {
   }
 
   /**
-   * Get documentation from OpenSpace
+   * Get documentation from OpenSpace.
    *
    * @param  type - The type of documentation to get.
    * @return An object representing the requested documentation.
@@ -232,7 +254,8 @@ export class OpenSpaceApi {
   }
 
   /**
-   * Subscribe to a property
+   * Subscribe to a property value. Anytime the property value changes, the subscribed
+   * topic recieves the updated value.
    *
    * @param property - The URI of the property.
    * @param expectedType - The expected property type to subscribe to. If the expected
@@ -263,7 +286,7 @@ export class OpenSpaceApi {
     const expected = expectedType;
 
     async function* narrowedIterator(): AsyncGenerator<
-      NarrowedSubscriptionData<T>,
+      NarrowedSubscriptionTopicData<T>,
       void,
       void
     > {
@@ -299,13 +322,21 @@ export class OpenSpaceApi {
     };
   }
 
+  // @TODO (anden88: 2026-05-06): Right now any lua function will create a new topic.
+  // should we instead let the class keep one reference to the luascript topic and this
+  // function uses the topic.talk to pass the new scripts, returning data as necessary
+  // only arguably benefit would be that we don't create a bunch of topics that gets
+  // immediately destroyed
+
   /**
-   * Execute a lua script
+   * Execute a lua script.
    *
    * @param  script - The lua script to execute.
    * @param  getReturnValue - Specified whether the return value should be collected.
-   * @param  shouldBeSynchronized - Specified whether the script should be synchronized on a cluster
-   * @return The return value of the script, if `getReturnValue` is true, otherwise undefined.
+   * @param  shouldBeSynchronized - Specified whether the script should be synchronized on
+   * a cluster.
+   * @return The return value of the script, if `getReturnValue` is true, otherwise
+   * undefined.
    */
   async executeLuaScript(
     script: string,
@@ -337,13 +368,13 @@ export class OpenSpaceApi {
   // `getReturnValue` is true
 
   /**
-   * Subscribe to a property
+   * Execute a Lua function from the OpenSpace library.
    *
-   * @param property - The URI of the property.
-   * @param expectedType - The expected property type to subscribe to. If the expected
-   * type is different from the actual type an error is thrown.
-   * @return A topic object to represent the subscription topic. When cancelled, this
-   * object will unsubscribe to the property.
+   * @param fun - The Lua function to execute, for example `openspace.addSceneGraphNode`.
+   * @param args - The function arguments.
+   * @param getReturnValue - Specified whether the return value should be collected
+   * @return The return value of the script, if `getReturnValue` is true, otherwise
+   * nothing.
    */
   async executeLuaFunction(
     fun: string,
@@ -388,9 +419,9 @@ export class OpenSpaceApi {
   }
 
   /**
-   * Get an object representing the OpenSpace lua library.
+   * Get an object representing the OpenSpace Lua library.
    *
-   * @return The lua library, mapped to async JavaScript functions.
+   * @return The Lua library, mapped to async JavaScript functions.
    */
   async library<T = OpenSpaceLibrary>(): Promise<T> {
     // These are generic helper types used to build the OpenSpace library. Since we don't

@@ -74,110 +74,110 @@ export interface EventTopic {
       };
 }
 export interface ActionAddedData {
-  Event: 'ActionAdded';
-  Uri: string;
+  event: 'ActionAdded';
+  uri: string;
 }
 export interface ActionRemovedData {
-  Event: 'ActionRemoved';
-  Uri: string;
+  event: 'ActionRemoved';
+  uri: string;
 }
 export interface ApplicationShutdownData {
-  Event: 'ApplicationShutdown';
-  State: 'Started' | 'Aborted' | 'Finished';
+  event: 'ApplicationShutdown';
+  state: 'Started' | 'Aborted' | 'Finished';
 }
 export interface AssetLoadingData {
-  AssetPath: string;
-  Event: 'AssetLoading';
-  State: 'Loaded' | 'Loading' | 'Unloaded' | 'Error';
+  assetPath: string;
+  event: 'AssetLoading';
+  state: 'Loaded' | 'Loading' | 'Unloaded' | 'Error';
 }
 export interface CameraFocusTransitionData {
-  Event: 'CameraFocusTransition';
-  Node: string;
-  Transition: 'Approaching' | 'Reaching' | 'Receding' | 'Exiting';
+  event: 'CameraFocusTransition';
+  node: string;
+  transition: 'Approaching' | 'Reaching' | 'Receding' | 'Exiting';
 }
 export interface CameraMovedPositionData {
-  Event: 'CameraMovedPosition';
+  event: 'CameraMovedPosition';
 }
 export interface CameraPathFinishedData {
-  Destination: string;
-  Event: 'CameraPathFinished';
-  Origin: string;
+  destination: string;
+  event: 'CameraPathFinished';
+  origin: string;
 }
 export interface CameraPathStartedData {
-  Destination: string;
-  Event: 'CameraPathStarted';
-  Origin: string;
+  destination: string;
+  event: 'CameraPathStarted';
+  origin: string;
 }
 export interface CustomData {
-  Event: 'Custom';
-  Payload: string;
-  Subtype: string;
+  event: 'Custom';
+  payload: string;
+  subtype: string;
 }
 export interface FocusNodeChangedData {
-  Event: 'FocusNodeChanged';
-  NewNode: string;
-  OldNode: string;
+  event: 'FocusNodeChanged';
+  newNode: string;
+  oldNode: string;
 }
 export interface GuiTreeUpdatedData {
-  Event: 'GuiTreeUpdated';
+  event: 'GuiTreeUpdated';
 }
 export interface InterpolationFinishedData {
-  Event: 'InterpolationFinished';
-  Property: string;
+  event: 'InterpolationFinished';
+  property: string;
 }
 export interface MissionAddedData {
-  Event: 'MissionAdded';
-  Identifier: string;
+  event: 'MissionAdded';
+  identifier: string;
 }
 export interface MissionEventReachedData {
-  Event: 'MissionEventReached';
+  event: 'MissionEventReached';
 }
 export interface MissionRemovedData {
-  Event: 'MissionRemoved';
-  Identifier: string;
+  event: 'MissionRemoved';
+  identifier: string;
 }
 export interface ParallelConnectionData {
-  Event: 'ParallelConnection';
-  State: 'Established' | 'Lost' | 'HostshipGained' | 'HostshipLost';
+  event: 'ParallelConnection';
+  state: 'Established' | 'Lost' | 'HostshipGained' | 'HostshipLost';
 }
 export interface PlanetEclipsedData {
-  Eclipsee: string;
-  Eclipser: string;
-  Event: 'PlanetEclipsed';
+  eclipsee: string;
+  eclipser: string;
+  event: 'PlanetEclipsed';
 }
 export interface PointSpacecraftData {
-  Dec: number;
-  Duration: number;
-  Event: 'PointSpacecraft';
-  Ra: number;
+  dec: number;
+  duration: number;
+  event: 'PointSpacecraft';
+  ra: number;
 }
 export interface ProfileLoadingFinishedData {
-  Event: 'ProfileLoadingFinished';
+  event: 'ProfileLoadingFinished';
 }
 export interface PropertyTreePrunedData {
-  Event: 'PropertyTreePruned';
-  Uri: string;
+  event: 'PropertyTreePruned';
+  uri: string;
 }
 export interface PropertyTreeUpdatedData {
-  Event: 'PropertyTreeUpdated';
-  Uri: string;
+  event: 'PropertyTreeUpdated';
+  uri: string;
 }
 export interface RenderableDisabledData {
-  Event: 'RenderableDisabled';
-  Node: string;
+  event: 'RenderableDisabled';
+  node: string;
 }
 export interface RenderableEnabledData {
-  Event: 'RenderableEnabled';
-  Node: string;
+  event: 'RenderableEnabled';
+  node: string;
 }
 export interface ScheduledScriptExecutedData {
-  Event: 'ScheduledScriptExecuted';
-  Script: string;
+  event: 'ScheduledScriptExecuted';
+  script: string;
 }
 export interface SessionRecordingPlaybackData {
-  Event: 'SessionRecordingPlayback';
-  State: 'Started' | 'Paused' | 'Resumed' | 'Finished';
+  event: 'SessionRecordingPlayback';
+  state: 'Started' | 'Paused' | 'Resumed' | 'Finished';
 }
 export interface TimeOfInterestReachedData {
-  Event: 'TimeOfInterestReached';
+  event: 'TimeOfInterestReached';
 }

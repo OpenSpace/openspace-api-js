@@ -5,13 +5,7 @@
  */
 
 export interface ErrorLogTopic {
-  data: {
-    category?: string;
-    dateStamp?: string;
-    level?: LogLevel;
-    message: string;
-    timeStamp?: string;
-  };
+  data: LogMessage;
   topicId: 'errorLog';
   topicPayload:
     | {
@@ -26,6 +20,13 @@ export interface ErrorLogTopic {
         logLevel: LogLevel;
       };
 }
+export interface LogMessage {
+  category?: string;
+  dateStamp?: string;
+  level?: LogLevel;
+  message: string;
+  timeStamp?: string;
+}
 export interface Settings {
   categoryStamping?: boolean;
   dateStamping?: boolean;
@@ -34,7 +35,7 @@ export interface Settings {
   timeStamping?: boolean;
 }
 
-export const enum LogLevel {
+export enum LogLevel {
   All = 'All',
   Trace = 'Trace',
   Debug = 'Debug',

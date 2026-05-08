@@ -6,10 +6,14 @@
 
 export interface ActionKeybindTopic {
   data:
-    | Action
+    | {
+        action: Action;
+        type: 'action';
+      }
     | {
         actions: Action[];
         keybinds: Keybind[];
+        type: 'combined';
       };
   topicId: 'actionsKeybinds';
   topicPayload:

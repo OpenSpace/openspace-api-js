@@ -6,7 +6,8 @@
 
 export type FlightControllerCommand =
   | FlightControllerDisconnectCommand
-  | FlightControllerInputStateCommand;
+  | FlightControllerInputStateCommand
+  | FlightControllerConnectCommand;
 
 export interface FlightControllerTopic {
   data: null;
@@ -31,4 +32,7 @@ export interface AxisValues {
   panY?: number;
   zoomIn?: number;
   zoomOut?: number;
+}
+export interface FlightControllerConnectCommand {
+  event: 'connect';
 }

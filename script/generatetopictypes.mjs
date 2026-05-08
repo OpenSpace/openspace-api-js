@@ -138,6 +138,7 @@ async function generatePropertiesTypes() {
   try {
     const ts = await compileFromFile(propertiesSchemaPath, {
       additionalProperties: false,
+      enableConstEnums: false,
       unreachableDefinitions: true,
       bannerComment: BannerComment,
       style: Style
@@ -170,6 +171,7 @@ async function generateTypesForTopics(propertyDefNames) {
     try {
       let ts = await compileFromFile(inputPath, {
         additionalProperties: false,
+        enableConstEnums: false,
         bannerComment: BannerComment,
         style: Style
       });
@@ -204,6 +206,7 @@ function generateIndexFile() {
   // Property types are the foundation — re-exported first so consuming code can import
   // AnyProperty, PropertyOwner etc. from the index
   reExports.push(`export * from './properties';`);
+  reExports.push(`export * from './openspacelualibrary';`);
 
   // Re-export topic types and collect topic names for the union
   for (const file of schemaFiles) {

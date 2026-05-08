@@ -2,10 +2,34 @@
   "name": "openspace-api-js",
   "version": "0.1.6",
   "description": "OpenSpace Socket/Websocket API bindings for JavaScript",
-  "main": "dist/node.js",
-  "types": "dist/types/node.d.ts",
+  "main": "./dist/node.js",
   "browser": {
-    "./src/node.js": "./dist/browser.js"
+    "./dist/node.js": "./dist/browser.js"
+  },
+  "types": "./dist/node.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js",
+      "require": "./dist/node.js",
+      "browser": "./dist/browser.js",
+      "default": "./dist/node.js"
+    },
+    "./generated": {
+      "types": "./dist/types/generated/index.d.ts",
+      "import": "./dist/types/generated/index.js",
+      "require": "./dist/types/generated/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/types.d.ts",
+      "import": "./dist/types/types.js",
+      "require": "./dist/types/types.js"
+    },
+    "./topics": {
+      "require": "./dist/topic.js",
+      "import": "./dist/topic.js",
+      "types": "./dist/topic.d.ts"
+    }
   },
   "files": [
     "dist/",

@@ -45,6 +45,6 @@ export interface CameraTopic {
   };
   topicId: 'camera';
   topicPayload: {
-    event: 'start_subscription';
+    event: 'start_subscription' | 'stop_subscription';
   };
 }

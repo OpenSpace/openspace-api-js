@@ -17,7 +17,7 @@ export interface DownloadEventTopic {
   };
 }
 
-export const enum DownloadType {
+export enum DownloadType {
   Started = 0,
   Progress = 1,
   Finished = 2,

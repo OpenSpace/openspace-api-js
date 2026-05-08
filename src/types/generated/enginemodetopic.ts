@@ -6,10 +6,16 @@
 
 export interface EngineModeTopic {
   data: {
-    mode: 'user_control' | 'session_recording_playback' | 'camera_path';
+    mode: EngineMode;
   };
   topicId: 'engineMode';
   topicPayload: {
     event: 'start_subscription' | 'stop_subscription' | 'refresh';
   };
+}
+
+export enum EngineMode {
+  UserControl = 'user_control',
+  SessionRecordingPlayback = 'session_recording_playback',
+  CameraPath = 'camera_path'
 }

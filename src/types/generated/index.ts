@@ -1,6 +1,7 @@
 // AUTO-GENERATED FILE — DO NOT EDIT
 
 export * from './properties';
+export * from './openspacelualibrary';
 export * from './actionkeybindtopic';
 export * from './authorizationtopic';
 export * from './camerapathtopic';
@@ -18,6 +19,7 @@ export * from './profiletopic';
 export * from './propertytreetopic';
 export * from './sessionrecordingtopic';
 export * from './setpropertytopic';
+export * from './skybrowsertopic';
 export * from './subscriptiontopic';
 export * from './timetopic';
 export * from './triggerpropertytopic';
@@ -40,6 +42,7 @@ import { ProfileTopic } from './profiletopic';
 import { PropertyTreeTopic } from './propertytreetopic';
 import { SessionRecordingTopic } from './sessionrecordingtopic';
 import { SetPropertyTopic } from './setpropertytopic';
+import { SkyBrowserTopic } from './skybrowsertopic';
 import { SubscriptionTopic } from './subscriptiontopic';
 import { TimeTopic } from './timetopic';
 import { TriggerPropertyTopic } from './triggerpropertytopic';
@@ -63,6 +66,7 @@ export type AllTopics =
   | PropertyTreeTopic
   | SessionRecordingTopic
   | SetPropertyTopic
+  | SkyBrowserTopic
   | SubscriptionTopic
   | TimeTopic
   | TriggerPropertyTopic

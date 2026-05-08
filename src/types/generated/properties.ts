@@ -432,7 +432,7 @@ export interface TriggerProperty {
     visibility: PropertyVisibility;
   };
   uri: string;
-  value: boolean;
+  value: null;
 }
 /**
  * This interface was referenced by `DummyInterface`'s JSON-Schema
