@@ -37,10 +37,11 @@
   ],
   "scripts": {
     "build": "rimraf dist && tsc --project tsconfig.json && rollup --config rollup.config.ts --configPlugin typescript",
-    "example": "npx ts-node examples/example.ts",
     "typecheck": "tsc --noEmit",
     "generate-lua-library": "pip install -r script/requirements.txt && python script/generatetypescriptfile.py",
-    "generate-topic-types": "node script/generatetopictypes.mjs"
+    "generate-topic-types": "node script/generatetopictypes.mjs",
+    "examples-javascript": "node examples/example.js",
+    "examples-typescript": "npx ts-node examples/example.ts"
   },
   "author": "OpenSpace Team",
   "license": "MIT",

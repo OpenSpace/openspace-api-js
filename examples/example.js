@@ -1,5 +1,5 @@
-import OpenSpaceApi from '../src/api';
-import Socket from './socket';
+const { OpenSpaceApi } = require('../dist/api.js');
+const { Socket } = require('../dist/socket.js');
 
 const password = '';
 
@@ -15,75 +15,65 @@ api.onConnect(async () => {
 
   try {
     await api.authenticate(password);
-  } catch(e) {
+  } catch (e) {
     console.log('Authenication failed. Error: \n', e);
     return;
-  };
+  }
 
   let openspace = {};
   try {
-    openspace = await api.singleReturnLibrary();
+    openspace = await api.library();
   } catch (e) {
-    console.log('OpenSpace library could not be loaded: Error: \n', e)
+    console.log('OpenSpace library could not be loaded: Error: \n', e);
     return;
   }
 
   getTime(openspace);
-  // getGeoPositionForCamera(openspace);
-  // getScaleUpdates();
-  // setInterval(() => addSceneGraphNode(openspace), 2000);
-  // scaleEarth(api);
+  getGeoPositionForCamera(openspace);
+  getScaleUpdates();
+  setInterval(() => addSceneGraphNode(openspace), 2000);
+  scaleEarth(api);
 });
 
 api.connect();
 
-
-// Functions:
-
 async function getScaleUpdates() {
-  const subscription = api.subscribeToProperty('Scene.Earth.Scale.Scale');
+  const topic = api.subscribeToProperty('Scene.Earth.Scale.Scale');
   let i = 0;
-  (async () => {
+
+  async function loop() {
     try {
-      for await (const data of subscription.iterator()) {
-        console.log(data);
+      for await (const data of topic) {
+        console.log('Earth scale: ' + data);
+
         if (i > 3) {
-          subscription.cancel();
+          topic.cancel();
         }
         ++i;
       }
     } catch (e) {
       console.log('Failed to get data from property. Error: \n', e);
     }
-  })();
+  }
+
+  loop();
 }
 
 async function getTime(openspace) {
   try {
-    const t = await openspace.time.UTC();
-    console.log("Current simulation time: " + t);
+    const time = await openspace.time.UTC();
+    console.log('Current simulation time: ' + time);
   } catch (e) {
-    console.log('failed to get time. Error: \n', e);
-  }
-}
-
-
-
-async function getGeoPosition(openspace) {
-  try {
-    const pos = await openspace.globebrowsing.getGeoPosition("Earth", 10, 10, 10);
-    console.log(pos);
-  } catch (e) {
-    console.log('failed to get geo position. Error: \n', e);
+    console.log('Failed to get time. Error: \n', e);
   }
 }
 
 async function getGeoPositionForCamera(openspace) {
   try {
-    const pos = await openspace.globebrowsing.getGeoPositionForCamera();
-    console.log(pos);
+    const pos = await openspace.globebrowsing.geoPositionForCamera();
+    console.log('Geo position', pos);
   } catch (e) {
-    console.log('failed to get geo position for camera. Error: \n', e);
+    console.log('Failed to get geo position for camera. Error: \n', e);
   }
 }
 
@@ -98,7 +88,7 @@ async function addSceneGraphNode(openspace) {
       Parent: 'Earth',
       Transform: {
         Translation: {
-          Type:"GlobeTranslation",
+          Type: 'GlobeTranslation',
           Globe: 'Earth',
           Latitude: (nodeIndex * 13) % 90,
           Longitude: (nodeIndex * 17) % 180,
@@ -106,36 +96,37 @@ async function addSceneGraphNode(openspace) {
         }
       },
       GUI: {
-        Path: "/Other/Test",
-        Name: 'TestNode'
+        Path: '/Other/Test',
+        Name: name
       }
     });
   } catch (e) {
-    console.log("Failed to add scene graph node. Error: \n ", e);
+    console.log('Failed to add scene graph node. Error: \n ', e);
   }
 
   nodeIndex++;
   console.log('Added ' + name);
 
   try {
-    openspace.setPropertyValue("NavigationHandler.OrbitalNavigator.Anchor", identifier);
-    openspace.setPropertyValue("NavigationHandler.OrbitalNavigator.RetargetAnchor", null);
+    openspace.setPropertyValue('NavigationHandler.OrbitalNavigator.Anchor', identifier);
+    openspace.setPropertyValue('NavigationHandler.OrbitalNavigator.RetargetAnchor', null);
   } catch (e) {
-    console.log("Failed to set anchor node. Error: \n ", e);
+    console.log('Failed to set anchor node. Error: \n ', e);
   }
-  
 }
 
 async function scaleEarth(api) {
-  console.log('scaling earth');
+  const uri = 'Scene.Earth.Scale.Scale';
 
-  const property = 'Scene.Earth.Scale.Scale';
-
-  const data = await api.getProperty(property);
-  let target = 2;
-  if (data.Value > 1) {
-    target = 1;
+  const data = await api.getProperty(uri);
+  if (data.type === 'property') {
+    let target = 2;
+    if (data.value.value > 1) {
+      target = 1;
+    }
+    console.log('Scaling Earth: ' + target);
+    api.setProperty(uri, target);
+  } else if (data.type === 'propertyOwner') {
+    console.log('Error: expected ' + uri + ' to be a property');
   }
-  api.setProperty(property, target);
-
 }
