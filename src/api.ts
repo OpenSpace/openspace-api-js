@@ -25,10 +25,20 @@ import {
 
 type TopicID = number;
 
+const ApiVersion = {
+  type: 'apiHandshake',
+  apiVersion: {
+    major: 1,
+    minor: 0,
+    patch: 0
+  }
+} as const;
+
 export class OpenSpaceApi {
   private _callbacks: Record<TopicID, (payload: unknown) => void> = {};
   private _nextTopicId: TopicID = 0;
   private _socket: ISocket;
+  private _userOnConnect: (() => void) | null = null;
 
   /**
    * Construct an instance of the OpenSpace API.
@@ -48,6 +58,16 @@ export class OpenSpaceApi {
     });
 
     this._socket = socket;
+    this._socket.onConnect(() => {
+      // Always send API handshake before any user-registered onConnect
+      this._sendHandshake();
+      // Call user defined onConnect if it exists
+      this._userOnConnect?.();
+    });
+  }
+
+  private _sendHandshake() {
+    this._socket.send(JSON.stringify(ApiVersion));
   }
 
   /**
@@ -56,7 +76,7 @@ export class OpenSpaceApi {
    * @param callback - The function to execute when connection is established.
    */
   onConnect(callback: () => void) {
-    this._socket.onConnect(callback);
+    this._userOnConnect = callback;
   }
 
   /**
