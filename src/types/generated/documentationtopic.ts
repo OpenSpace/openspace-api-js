@@ -14,7 +14,6 @@ export interface DocumentationTopic {
 export interface LuaLibrary {
   fullName: string;
   functions: LuaFunction[];
-  library: string;
   name: string;
 }
 export interface LuaFunction {

@@ -160,7 +160,7 @@ def writeOpenSpaceInterface(libraries, functions):
     file.write("export interface OpenSpaceLibrary {\n")
 
     for library in libraries:
-      lib = library["library"]
+      lib = library["name"]
       if not lib:
         continue
       capitalizedLib = lib[0].upper() + lib[1:]
@@ -205,10 +205,10 @@ async def main():
   for library in docs:
     if library == defaultLibrary:
       continue
-    if not library["library"]:
+    if not library["name"]:
       continue
     functions = library["functions"]
-    writeLibraryToFile(library["library"], functions)
+    writeLibraryToFile(library["name"], functions)
 
   api.disconnect()
 
