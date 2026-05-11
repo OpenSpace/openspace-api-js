@@ -40,5 +40,10 @@ export interface Action {
 export interface Keybind {
   action: string;
   key: string;
-  modifiers: ('shift' | 'control' | 'alt' | 'super')[];
+  modifiers: {
+    alt: boolean;
+    control: boolean;
+    shift: boolean;
+    super: boolean;
+  };
 }

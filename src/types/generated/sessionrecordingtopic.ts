@@ -13,7 +13,10 @@ export interface SessionRecordingTopic {
   topicPayload:
     | {
         event: 'start_subscription';
-        properties: ('files' | 'state')[];
+        /**
+         * @minItems 1
+         */
+        properties: ['files' | 'state', ...('files' | 'state')[]];
       }
     | {
         event: 'stop_subscription';

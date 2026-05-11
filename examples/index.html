@@ -27,7 +27,7 @@
         max="5.0"
         step="0.1"
       />
-      <label id="earth-scale-display" for="scale">Loading...</label>
+      <label id="earth-scale-display" for="earth-scale-input">Loading...</label>
     </div>
   </body>
   <script>
@@ -41,22 +41,24 @@
       // Get the OpenSpace Lua library functions
       const openspace = await api.library();
 
-      // Example 1: Execute a Lua function to get the current simulation time.
+      // Example 1: Execute a Lua function to get the current simulation time
       const time = await openspace.time.UTC();
       console.log('Openspace simulation time is: ' + time);
 
-      // Example 2: Subscribe to Earth's scale and print it on the page.
+      // Example 2: Subscribe to Earth's scale and print it on the page
       const topic = api.subscribeToProperty('Scene.Earth.Scale.Scale');
       async function listenToScale() {
         for await (const data of topic) {
           console.log(data);
-          document.getElementById('earth-scale-display').textContent =
-            'Earth scale: ' + data.value;
+          if (data.type === 'value') {
+            document.getElementById('earth-scale-display').textContent =
+              'Earth scale: ' + data.value;
+          }
         }
       }
       listenToScale();
 
-      // Example 3: Use a range input to set Earth's scale.
+      // Example 3: Use a range input to set Earth's scale
       function onInput(event) {
         api.setProperty('Scene.Earth.Scale.Scale', parseFloat(event.target.value));
       }

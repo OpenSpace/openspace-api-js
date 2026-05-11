@@ -51,7 +51,7 @@
         /**
          * Cancel the topic subscription. After calling this function, the topic will no longer
          * yield data from OpenSpace, and any resources associated with the topic on the
-         * OpenSpace serever will be freed. Note that after cancelling, the topic object should
+         * OpenSpace server will be freed. Note that after cancelling, the topic object should
          * not be used anymore.
          */
         cancel() {
@@ -83,12 +83,17 @@
          */
         constructor(socket) {
             socket.onMessage((message) => {
-                const messageObject = JSON.parse(message);
-                if (messageObject.topic !== undefined) {
-                    const callback = this._callbacks[messageObject.topic];
-                    if (callback && messageObject.payload) {
-                        callback(messageObject.payload);
+                try {
+                    const messageObject = JSON.parse(message);
+                    if (messageObject.topic !== undefined) {
+                        const callback = this._callbacks[messageObject.topic];
+                        if (callback && 'payload' in messageObject) {
+                            callback(messageObject.payload);
+                        }
                     }
+                }
+                catch (e) {
+                    console.error(`Error handling message from OpenSpace: ${e}\nMessage: ${message}`);
                 }
             });
             this._socket = socket;
@@ -151,7 +156,7 @@
             this._socket.send(JSON.stringify(messageObject));
             // `cancelPromise` resolves when the topic is cancelled, which causes the iterator to
             // stop yielding and the callback to be cleaned up. @TODO (anden88: 2025-05-05): does
-            // the topic cancel correctly if we're still waiting for data that hasn't recieved yet?
+            // the topic cancel correctly if we're still waiting for data that hasn't received yet?
             let resolveCancel = () => { };
             const cancelPromise = new Promise((resolve) => (resolveCancel = resolve));
             const promise = () => {
@@ -213,7 +218,7 @@
          * Set the property value.
          *
          * @param property - The URI of the property to set.
-         * @param  value - The value to set the property to.
+         * @param value - The value to set the property to.
          */
         setProperty(property, value) {
             const topic = this.startTopic('set', {
@@ -301,11 +306,11 @@
         // only arguably benefit would be that we don't create a bunch of topics that gets
         // immediately destroyed
         /**
-         * Execute a lua script.
+         * Execute a Lua script.
          *
-         * @param  script - The lua script to execute.
-         * @param  getReturnValue - Specified whether the return value should be collected.
-         * @param  shouldBeSynchronized - Specified whether the script should be synchronized on
+         * @param script - The Lua script to execute.
+         * @param getReturnValue - Specified whether the return value should be collected.
+         * @param shouldBeSynchronized - Specified whether the script should be synchronized on
          * a cluster.
          * @return The return value of the script, if `getReturnValue` is true, otherwise
          * undefined.

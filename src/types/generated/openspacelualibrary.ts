@@ -1027,7 +1027,7 @@ export interface GlobebrowsingLibrary {
    * Get geographic coordinates of the camera position in latitude, longitude, and altitude (degrees and meters).
    * @param useEyePosition If true, use the view direction of the camera instead of the camera position
    */
-  geoPositionForCamera: (useEyePosition?: boolean) => Promise<vec3>
+  geoPositionForCamera: (useEyePosition?: boolean) => Promise<[number, number, number]>
   /**
    * Returns an object containing a list of all loaded `RenderableGlobe`s sorted first by the presence of WMS server info, then alphabetically. The index `firstIndexWithoutUrl` indicates the first item in the list that does not have WMS server info.
    * @returns Table containing a list of `renderableGlobe` identifiers, and an index indicating the first item in the list that does not have a WMS server
@@ -1746,7 +1746,7 @@ export interface SpaceLibrary {
   /**
    * Returns the formatted ra, dec strings and distance for a given cartesian world coordinate.
    */
-  convertToRaDec: (x: number, y: number, z: number) => Promise<table>
+  convertToRaDec: (x: number, y: number, z: number) => Promise<[string, string, number]>
   /**
    */
   readKeplerFile: (p: path, type: string) => Promise<table[]>

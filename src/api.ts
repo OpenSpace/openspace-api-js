@@ -48,12 +48,16 @@ export class OpenSpaceApi {
    */
   constructor(socket: ISocket) {
     socket.onMessage((message) => {
-      const messageObject = JSON.parse(message) as OpenSpaceData<TopicId>;
-      if (messageObject.topic !== undefined) {
-        const callback = this._callbacks[messageObject.topic];
-        if (callback && messageObject.payload) {
-          callback(messageObject.payload);
+      try {
+        const messageObject = JSON.parse(message) as OpenSpaceData<TopicId>;
+        if (messageObject.topic !== undefined) {
+          const callback = this._callbacks[messageObject.topic];
+          if (callback && 'payload' in messageObject) {
+            callback(messageObject.payload);
+          }
         }
+      } catch (e) {
+        console.error(`Error handling message from OpenSpace: ${e}\nMessage: ${message}`);
       }
     });
 
@@ -129,7 +133,7 @@ export class OpenSpaceApi {
 
     // `cancelPromise` resolves when the topic is cancelled, which causes the iterator to
     // stop yielding and the callback to be cleaned up. @TODO (anden88: 2025-05-05): does
-    // the topic cancel correctly if we're still waiting for data that hasn't recieved yet?
+    // the topic cancel correctly if we're still waiting for data that hasn't received yet?
     let resolveCancel = () => {};
     const cancelPromise = new Promise<void>((resolve) => (resolveCancel = resolve));
 
@@ -195,7 +199,7 @@ export class OpenSpaceApi {
    * Set the property value.
    *
    * @param property - The URI of the property to set.
-   * @param  value - The value to set the property to.
+   * @param value - The value to set the property to.
    */
   setProperty(property: string, value: JsonValue) {
     const topic = this.startTopic('set', {
@@ -246,7 +250,7 @@ export class OpenSpaceApi {
   /**
    * Get documentation from OpenSpace.
    *
-   * @param  type - The type of documentation to get.
+   * @param type - The type of documentation to get.
    * @return An object representing the requested documentation.
    */
   async getDocumentation(type: 'lua'): Promise<LuaLibrary[]>;
@@ -275,7 +279,7 @@ export class OpenSpaceApi {
 
   /**
    * Subscribe to a property value. Anytime the property value changes, the subscribed
-   * topic recieves the updated value.
+   * topic receives the updated value.
    *
    * @param property - The URI of the property.
    * @param expectedType - The expected property type to subscribe to. If the expected
@@ -349,11 +353,11 @@ export class OpenSpaceApi {
   // immediately destroyed
 
   /**
-   * Execute a lua script.
+   * Execute a Lua script.
    *
-   * @param  script - The lua script to execute.
-   * @param  getReturnValue - Specified whether the return value should be collected.
-   * @param  shouldBeSynchronized - Specified whether the script should be synchronized on
+   * @param script - The Lua script to execute.
+   * @param getReturnValue - Specified whether the return value should be collected.
+   * @param shouldBeSynchronized - Specified whether the script should be synchronized on
    * a cluster.
    * @return The return value of the script, if `getReturnValue` is true, otherwise
    * undefined.

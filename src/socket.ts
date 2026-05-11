@@ -25,6 +25,7 @@ export class Socket implements ISocket {
 
   connect() {
     this._client = net.createConnection(this._port, this._address, this._onConnect);
+    this._inBuffer = '';
 
     // @TODO (anden 2026-03-24): should we have another delimiter instead of '\n'?
     this._client.on('data', (data) => {

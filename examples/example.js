@@ -44,7 +44,7 @@ async function getScaleUpdates() {
   async function loop() {
     try {
       for await (const data of topic) {
-        console.log('Earth scale: ' + data);
+        console.log(`Earth scale: ${data}`);
 
         if (i > 3) {
           topic.cancel();
@@ -62,7 +62,7 @@ async function getScaleUpdates() {
 async function getTime(openspace) {
   try {
     const time = await openspace.time.UTC();
-    console.log('Current simulation time: ' + time);
+    console.log(`Current simulation time: ${time} `);
   } catch (e) {
     console.log('Failed to get time. Error: \n', e);
   }
@@ -71,7 +71,7 @@ async function getTime(openspace) {
 async function getGeoPositionForCamera(openspace) {
   try {
     const pos = await openspace.globebrowsing.geoPositionForCamera();
-    console.log('Geo position', pos);
+    console.log(`Geo position: ${pos}`);
   } catch (e) {
     console.log('Failed to get geo position for camera. Error: \n', e);
   }
@@ -124,9 +124,9 @@ async function scaleEarth(api) {
     if (data.value.value > 1) {
       target = 1;
     }
-    console.log('Scaling Earth: ' + target);
+    console.log(`Scaling Earth: ${target}`);
     api.setProperty(uri, target);
   } else if (data.type === 'propertyOwner') {
-    console.log('Error: expected ' + uri + ' to be a property');
+    console.log(`Error: expected '${uri}' to be a property `);
   }
 }

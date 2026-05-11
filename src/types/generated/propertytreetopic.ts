@@ -11,7 +11,7 @@ export interface PropertyTreeTopic {
     | {
         type: 'value';
         /**
-         * The URI of the property that this value corresponds to
+         * The URI of the property this value corresponds to
          */
         uri: string;
         value: JsonValue;
@@ -54,7 +54,7 @@ export interface PropertyTreeTopic {
           | Vec4PropertyMetaData;
         type: 'metaData';
         /**
-         * The URI of the property that this value corresponds to
+         * The URI of the property this value corresponds to
          */
         uri: string;
       };

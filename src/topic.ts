@@ -60,7 +60,7 @@ export class Topic<T extends TopicId> {
   /**
    * Cancel the topic subscription. After calling this function, the topic will no longer
    * yield data from OpenSpace, and any resources associated with the topic on the
-   * OpenSpace serever will be freed. Note that after cancelling, the topic object should
+   * OpenSpace server will be freed. Note that after cancelling, the topic object should
    * not be used anymore.
    */
   cancel() {

@@ -116,7 +116,7 @@ def writeLibraryToFile(libraryName, functions):
 def writeCustomTypes(file):
   """
   Write custom helper types that are used in the API documentation but not directly
-  translateable to TypeScript types.
+  translatable to TypeScript types.
   """
   file.write("\n")
   file.write("type path = string;\n")

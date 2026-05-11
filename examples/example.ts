@@ -19,7 +19,7 @@ api.onConnect(async () => {
   try {
     await api.authenticate(password);
   } catch (e) {
-    console.log('Authenication failed. Error: \n', e);
+    console.log('Authentication failed. Error: \n', e);
     return;
   }
 
@@ -55,7 +55,7 @@ async function main() {
 async function getTime() {
   try {
     const time = await openspace?.time.UTC();
-    console.log('Current simulation time: ' + time);
+    console.log(`Current simulation time: ${time}`);
   } catch (e) {
     console.log('Failed to get time. Error: \n', e);
   }
@@ -68,7 +68,7 @@ async function getGeoPositionForCamera() {
     }
 
     const pos = await openspace.globebrowsing.geoPositionForCamera();
-    console.log('Geo position', pos);
+    console.log(`Geo position: ${pos}`);
   } catch (e) {
     console.log('Failed to get geo position for camera. Error: \n', e);
   }
@@ -93,7 +93,7 @@ async function getScaleUpdates() {
           topic.cancel();
           return;
         }
-        ++i;
+        i++;
       }
     } catch (e) {
       console.log('Failed to get data from property. Error: \n', e);
@@ -105,8 +105,8 @@ async function getScaleUpdates() {
 
 let nodeIndex = 0;
 async function addSceneGraphNode() {
-  const identifier = 'TestNode' + nodeIndex;
-  const name = 'Test Node ' + nodeIndex;
+  const identifier = `TestNode${nodeIndex}`;
+  const name = `Test Node ${nodeIndex}`;
   try {
     await openspace?.addSceneGraphNode({
       Identifier: identifier,
@@ -131,7 +131,7 @@ async function addSceneGraphNode() {
   }
 
   nodeIndex++;
-  console.log('Added ' + name);
+  console.log(`Added ${name}`);
 
   openspace?.setPropertyValue('NavigationHandler.OrbitalNavigator.Anchor', identifier);
   openspace?.setPropertyValue('NavigationHandler.OrbitalNavigator.RetargetAnchor', null);
@@ -156,13 +156,10 @@ async function scaleEarth() {
       if (value > 1) {
         target = 1;
       }
-      console.log('Scaling Earth: ' + target);
+      console.log(`Scaling Earth: ${target}`);
       api.setProperty(uri, target);
     }
   }
-  //   else if (data.type === 'propertyOwner') {
-  //     console.log('Error: expected ' + uri + ' to be a property');
-  //   }
 
   // Option 2: Get the property with as an expected property type
   {
@@ -177,7 +174,7 @@ async function scaleEarth() {
       if (value > 1) {
         target = 1;
       }
-      console.log('Scaling Earth: ' + target);
+      console.log(`Scaling Earth: ${target}`);
       api.setProperty(uri, target);
     }
   }
