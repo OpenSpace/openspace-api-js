@@ -1,1 +1,12 @@
-node_modules/
+node_modules
+dist
+!dist/openspace-api.js
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Editor directories and files
+.vscode/*
+.idea

@@ -1,54 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <style>
-  body {
-    font-family: sans-serif;
-    background-color: #000;
-    color: #fff;
-  }
-</style>
-</head>
-<script src="../dist/openspace-api.js"></script>
-<body>
-  <h1>OpenSpace JavaScript API Example</h1>
-  <div>
-    <input id="earth-scale-input" type="range" id="start" name="scale"
-         min="0.1" max="5.0" step="0.1">
-    <label id="earth-scale-display" for="scale">Loading...</label>
-  </div>
-</body>
-<script>
-  var api = window.openspaceApi('localhost', 4682);
+  <head>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #000;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <script src="../dist/openspace-api.js"></script>
+  <body>
+    <h1>OpenSpace JavaScript API Example</h1>
+    <p>
+      This example connects to a running OpenSpace instance via the WebSocket API. Make
+      sure OpenSpace is running with the API enabled (default: localhost:4682).
+    </p>
+    <p id="status">Connecting...</p>
+    <div>
+      <label for="earth-scale-input">Earth Scale</label><br />
+      <input
+        id="earth-scale-input"
+        type="range"
+        name="scale"
+        min="0.1"
+        max="5.0"
+        step="0.1"
+      />
+      <label id="earth-scale-display" for="earth-scale-input">Loading...</label>
+    </div>
+  </body>
+  <script>
+    // Create an OpenSpace connection
+    const api = window.openspaceApi('localhost', 4682);
 
-  api.onConnect(function () {
+    api.onConnect(async () => {
+      document.getElementById('status').textContent = 'Connected ✅';
+      console.log('Connected');
 
-    // Example 1: Execute a lua function to get the current simulation time.
-    api.singleReturnLibrary().then(function (openspace) {
-      openspace.time.UTC().then(function (data) {
-        console.log("OpenSpace simulation time is " + data);
-      });
+      // Get the OpenSpace Lua library functions
+      const openspace = await api.library();
+
+      // Example 1: Execute a Lua function to get the current simulation time
+      const time = await openspace.time.UTC();
+      console.log('Openspace simulation time is: ' + time);
+
+      // Example 2: Subscribe to Earth's scale and print it on the page
+      const topic = api.subscribeToProperty('Scene.Earth.Scale.Scale');
+      async function listenToScale() {
+        for await (const data of topic) {
+          console.log(data);
+          if (data.type === 'value') {
+            document.getElementById('earth-scale-display').textContent =
+              'Earth scale: ' + data.value;
+          }
+        }
+      }
+      listenToScale();
+
+      // Example 3: Use a range input to set Earth's scale
+      function onInput(event) {
+        api.setProperty('Scene.Earth.Scale.Scale', parseFloat(event.target.value));
+      }
+
+      const slider = document.getElementById('earth-scale-input');
+      slider.oninput = onInput;
     });
 
-    // Example 2: Subscribe to Earth's scale and print it on the page.
-    const topic = api.subscribeToProperty('Scene.Earth.Scale.Scale');
-    (function printScale() {
-      topic.iterator().next().then(function (it) {
-        document.getElementById('earth-scale-display').innerHTML = "Earth scale: " + it.value.Value;
-        printScale();
-      });
-    })();
+    api.onDisconnect(function () {
+      document.getElementById('status').textContent = 'Disconnected ❌';
+      console.log('Disconnected.');
+    });
 
-    // Example 3: Use a range input to set Earth's scale.
-    document.getElementById('earth-scale-input').oninput = function (event) {
-      api.setProperty('Scene.Earth.Scale.Scale', parseFloat(event.target.value));
-    }
-  });
-
-  api.onDisconnect(function () {
-    console.log('Disconnected.');
-  });
-
-  api.connect();
-</script>
+    api.connect();
+  </script>
 </html>
