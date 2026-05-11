@@ -5,32 +5,32 @@
  */
 
 export type EventData =
-  | ActionAddedData
-  | ActionRemovedData
-  | ApplicationShutdownData
-  | AssetLoadingData
-  | CameraFocusTransitionData
-  | CameraMovedPositionData
-  | CameraPathFinishedData
-  | CameraPathStartedData
-  | CustomData
-  | FocusNodeChangedData
-  | GuiTreeUpdatedData
-  | InterpolationFinishedData
-  | MissionAddedData
-  | MissionEventReachedData
-  | MissionRemovedData
-  | ParallelConnectionData
-  | PlanetEclipsedData
-  | PointSpacecraftData
-  | ProfileLoadingFinishedData
-  | PropertyTreePrunedData
-  | PropertyTreeUpdatedData
-  | RenderableDisabledData
-  | RenderableEnabledData
-  | ScheduledScriptExecutedData
-  | SessionRecordingPlaybackData
-  | TimeOfInterestReachedData;
+  | ActionAddedEventData
+  | ActionRemovedEventData
+  | ApplicationShutdownEventData
+  | AssetLoadingEventData
+  | CameraFocusTransitionEventData
+  | CameraMovedPositionEventData
+  | CameraPathFinishedEventData
+  | CameraPathStartedEventData
+  | CustomEventData
+  | FocusNodeChangedEventData
+  | GuiTreeUpdatedEventData
+  | InterpolationFinishedEventData
+  | MissionAddedEventData
+  | MissionEventReachedEventData
+  | MissionRemovedEventData
+  | ParallelConnectionEventData
+  | PlanetEclipsedEventData
+  | PointSpacecraftEventData
+  | ProfileLoadingFinishedEventData
+  | PropertyTreePrunedEventData
+  | PropertyTreeUpdatedEventData
+  | RenderableDisabledEventData
+  | RenderableEnabledEventData
+  | ScheduledScriptExecutedEventData
+  | SessionRecordingPlaybackEventData
+  | TimeOfInterestReachedEventData;
 export type EventTypeOrWildcard = EventType | ('*' | 'all');
 export type EventType =
   | 'ActionAdded'
@@ -73,111 +73,111 @@ export interface EventTopic {
         eventType: EventTypeOrWildcard | EventType[];
       };
 }
-export interface ActionAddedData {
+export interface ActionAddedEventData {
+  Uri: string;
   event: 'ActionAdded';
-  uri: string;
 }
-export interface ActionRemovedData {
+export interface ActionRemovedEventData {
+  Uri: string;
   event: 'ActionRemoved';
-  uri: string;
 }
-export interface ApplicationShutdownData {
+export interface ApplicationShutdownEventData {
+  State: 'Started' | 'Aborted' | 'Finished';
   event: 'ApplicationShutdown';
-  state: 'Started' | 'Aborted' | 'Finished';
 }
-export interface AssetLoadingData {
-  assetPath: string;
+export interface AssetLoadingEventData {
+  AssetPath: string;
+  State: 'Loaded' | 'Loading' | 'Unloaded' | 'Error';
   event: 'AssetLoading';
-  state: 'Loaded' | 'Loading' | 'Unloaded' | 'Error';
 }
-export interface CameraFocusTransitionData {
+export interface CameraFocusTransitionEventData {
+  Node: string;
+  Transition: 'Approaching' | 'Reaching' | 'Receding' | 'Exiting';
   event: 'CameraFocusTransition';
-  node: string;
-  transition: 'Approaching' | 'Reaching' | 'Receding' | 'Exiting';
 }
-export interface CameraMovedPositionData {
+export interface CameraMovedPositionEventData {
   event: 'CameraMovedPosition';
 }
-export interface CameraPathFinishedData {
-  destination: string;
+export interface CameraPathFinishedEventData {
+  Destination: string;
+  Origin: string;
   event: 'CameraPathFinished';
-  origin: string;
 }
-export interface CameraPathStartedData {
-  destination: string;
+export interface CameraPathStartedEventData {
+  Destination: string;
+  Origin: string;
   event: 'CameraPathStarted';
-  origin: string;
 }
-export interface CustomData {
+export interface CustomEventData {
+  Payload: string;
+  Subtype: string;
   event: 'Custom';
-  payload: string;
-  subtype: string;
 }
-export interface FocusNodeChangedData {
+export interface FocusNodeChangedEventData {
+  NewNode: string;
+  OldNode: string;
   event: 'FocusNodeChanged';
-  newNode: string;
-  oldNode: string;
 }
-export interface GuiTreeUpdatedData {
+export interface GuiTreeUpdatedEventData {
   event: 'GuiTreeUpdated';
 }
-export interface InterpolationFinishedData {
+export interface InterpolationFinishedEventData {
+  Property: string;
   event: 'InterpolationFinished';
-  property: string;
 }
-export interface MissionAddedData {
+export interface MissionAddedEventData {
+  Identifier: string;
   event: 'MissionAdded';
-  identifier: string;
 }
-export interface MissionEventReachedData {
+export interface MissionEventReachedEventData {
   event: 'MissionEventReached';
 }
-export interface MissionRemovedData {
+export interface MissionRemovedEventData {
+  Identifier: string;
   event: 'MissionRemoved';
-  identifier: string;
 }
-export interface ParallelConnectionData {
+export interface ParallelConnectionEventData {
+  State: 'Established' | 'Lost' | 'HostshipGained' | 'HostshipLost';
   event: 'ParallelConnection';
-  state: 'Established' | 'Lost' | 'HostshipGained' | 'HostshipLost';
 }
-export interface PlanetEclipsedData {
-  eclipsee: string;
-  eclipser: string;
+export interface PlanetEclipsedEventData {
+  Eclipsee: string;
+  Eclipser: string;
   event: 'PlanetEclipsed';
 }
-export interface PointSpacecraftData {
-  dec: number;
-  duration: number;
+export interface PointSpacecraftEventData {
+  Dec: number;
+  Duration: number;
+  Ra: number;
   event: 'PointSpacecraft';
-  ra: number;
 }
-export interface ProfileLoadingFinishedData {
+export interface ProfileLoadingFinishedEventData {
   event: 'ProfileLoadingFinished';
 }
-export interface PropertyTreePrunedData {
+export interface PropertyTreePrunedEventData {
+  Uri: string;
   event: 'PropertyTreePruned';
-  uri: string;
 }
-export interface PropertyTreeUpdatedData {
+export interface PropertyTreeUpdatedEventData {
+  Uri: string;
   event: 'PropertyTreeUpdated';
-  uri: string;
 }
-export interface RenderableDisabledData {
+export interface RenderableDisabledEventData {
+  Node: string;
   event: 'RenderableDisabled';
-  node: string;
 }
-export interface RenderableEnabledData {
+export interface RenderableEnabledEventData {
+  Node: string;
   event: 'RenderableEnabled';
-  node: string;
 }
-export interface ScheduledScriptExecutedData {
+export interface ScheduledScriptExecutedEventData {
   event: 'ScheduledScriptExecuted';
   script: string;
 }
-export interface SessionRecordingPlaybackData {
+export interface SessionRecordingPlaybackEventData {
+  State: 'Started' | 'Paused' | 'Resumed' | 'Finished';
   event: 'SessionRecordingPlayback';
-  state: 'Started' | 'Paused' | 'Resumed' | 'Finished';
 }
-export interface TimeOfInterestReachedData {
+export interface TimeOfInterestReachedEventData {
   event: 'TimeOfInterestReached';
 }
