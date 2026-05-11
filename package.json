@@ -1,6 +1,6 @@
 {
   "name": "openspace-api-js",
-  "version": "1.0.0",
+  "version": "0.9.9",
   "description": "OpenSpace Socket/Websocket API bindings for JavaScript",
   "main": "./dist/node.js",
   "browser": {
