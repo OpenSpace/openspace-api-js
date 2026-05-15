@@ -15,15 +15,20 @@
       "browser": "./dist/browser.js",
       "default": "./dist/node.js"
     },
+    "./api": {
+      "types": "./dist/api.d.ts",
+      "import": "./dist/api.js",
+      "require": "./dist/api.js"
+    },
     "./types": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/types/index.js",
       "require": "./dist/types/index.js"
     },
     "./topics": {
-      "require": "./dist/topic.js",
+      "types": "./dist/topic.d.ts",
       "import": "./dist/topic.js",
-      "types": "./dist/topic.d.ts"
+      "require": "./dist/topic.js"
     }
   },
   "files": [
