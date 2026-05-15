@@ -183,9 +183,7 @@ export class OpenSpaceApi {
    * @param secret - The secret used to authenticate with OpenSpace.
    */
   async authenticate(secret: string): Promise<TopicData<'authorize'>> {
-    const topic = this.startTopic('authorize', {
-      password: secret
-    });
+    const topic = this.startTopic('authorize', { password: secret });
     try {
       return await topic.next();
     } catch (e) {
@@ -202,10 +200,7 @@ export class OpenSpaceApi {
    * @param value - The value to set the property to.
    */
   setProperty(property: string, value: JsonValue) {
-    const topic = this.startTopic('set', {
-      property,
-      value
-    });
+    const topic = this.startTopic('set', { property, value });
     topic.cancel();
   }
 
@@ -265,9 +260,7 @@ export class OpenSpaceApi {
   async getDocumentation(
     type: TopicPayload<'documentation'>['type']
   ): Promise<TopicData<'documentation'>> {
-    const topic = this.startTopic('documentation', {
-      type
-    });
+    const topic = this.startTopic('documentation', { type });
     try {
       return await topic.next();
     } catch (e) {
