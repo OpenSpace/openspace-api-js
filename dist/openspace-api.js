@@ -201,9 +201,7 @@
          * @param secret - The secret used to authenticate with OpenSpace.
          */
         async authenticate(secret) {
-            const topic = this.startTopic('authorize', {
-                password: secret
-            });
+            const topic = this.startTopic('authorize', { password: secret });
             try {
                 return await topic.next();
             }
@@ -221,10 +219,7 @@
          * @param value - The value to set the property to.
          */
         setProperty(property, value) {
-            const topic = this.startTopic('set', {
-                property,
-                value
-            });
+            const topic = this.startTopic('set', { property, value });
             topic.cancel();
         }
         async getProperty(property, expectedType) {
@@ -250,9 +245,7 @@
             }
         }
         async getDocumentation(type) {
-            const topic = this.startTopic('documentation', {
-                type
-            });
+            const topic = this.startTopic('documentation', { type });
             try {
                 return await topic.next();
             }
