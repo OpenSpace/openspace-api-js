@@ -41,7 +41,8 @@
     "generate-lua-library": "pip install -r script/requirements.txt && python script/generatetypescriptfile.py",
     "generate-topic-types": "node script/generatetopictypes.mjs",
     "examples-javascript": "node examples/example.js",
-    "examples-typescript": "npx ts-node examples/example.ts"
+    "examples-typescript": "npx ts-node examples/example.ts",
+    "prepack": "npm run build"
   },
   "author": "OpenSpace Team",
   "license": "MIT",
