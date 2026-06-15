@@ -36,7 +36,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc --project tsconfig.json && tsc --project tsconfig.esm.json && rollup --config rollup.config.ts --configPlugin typescript",
+    "build": "rimraf dist && tsc --project tsconfig.cjs.json && tsc --project tsconfig.esm.json && rollup --config rollup.config.ts --configPlugin typescript",
     "typecheck": "tsc --noEmit",
     "generate-lua-library": "pip install -r script/requirements.txt && python script/generatetypescriptfile.py",
     "generate-topic-types": "node script/generatetopictypes.mjs",
