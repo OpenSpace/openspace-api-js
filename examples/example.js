@@ -1,5 +1,5 @@
-const { OpenSpaceApi } = require('../dist/api.js');
-const { Socket } = require('../dist/socket.js');
+const { OpenSpaceApi } = require('../dist/cjs/api.js');
+const { Socket } = require('../dist/cjs/socket.js');
 
 const password = '';
 
