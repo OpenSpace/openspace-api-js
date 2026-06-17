@@ -43,8 +43,8 @@ async function main() {
 
   for (let i = 0; i < 5; i++) {
     setTimeout(() => {
-      addSceneGraphNode();
-    }, 2000);
+      addSceneGraphNode(i);
+    }, i * 2000);
   }
 
   setTimeout(() => {
@@ -103,8 +103,7 @@ async function getScaleUpdates() {
   await loop();
 }
 
-let nodeIndex = 0;
-async function addSceneGraphNode() {
+async function addSceneGraphNode(nodeIndex: number) {
   const identifier = `TestNode${nodeIndex}`;
   const name = `Test Node ${nodeIndex}`;
   try {
@@ -130,7 +129,6 @@ async function addSceneGraphNode() {
     console.log('Failed to add scene graph node. Error: \n ', e);
   }
 
-  nodeIndex++;
   console.log(`Added ${name}`);
 
   openspace?.setPropertyValue('NavigationHandler.OrbitalNavigator.Anchor', identifier);

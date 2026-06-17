@@ -3,6 +3,8 @@
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "bundler",
-    "outDir": "./dist"
+    "declaration": true,
+    "outDir": "./dist/esm",
+    "declarationDir": "./dist/esm"
   }
 }

@@ -1,34 +1,34 @@
 {
   "name": "openspace-api-js",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "OpenSpace Socket/Websocket API bindings for JavaScript",
-  "main": "./dist/node.js",
+  "main": "./dist/cjs/node.js",
   "browser": {
-    "./dist/node.js": "./dist/browser.js"
+    "./dist/cjs/node.js": "./dist/cjs/browser.js"
   },
-  "types": "./dist/node.d.ts",
+  "types": "./dist/cjs/node.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/node.d.ts",
-      "import": "./dist/node.js",
-      "require": "./dist/node.js",
-      "browser": "./dist/browser.js",
-      "default": "./dist/node.js"
+      "browser": "./dist/esm/browser.js",
+      "import": "./dist/esm/node.js",
+      "require": "./dist/cjs/node.js",
+      "types": "./dist/cjs/node.d.ts",
+      "default": "./dist/cjs/node.js"
     },
     "./api": {
-      "types": "./dist/api.d.ts",
-      "import": "./dist/api.js",
-      "require": "./dist/api.js"
+      "import": "./dist/esm/api.js",
+      "require": "./dist/cjs/api.js",
+      "types": "./dist/cjs/api.d.ts"
     },
     "./types": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/types/index.js",
-      "require": "./dist/types/index.js"
+      "import": "./dist/esm/types/index.js",
+      "require": "./dist/cjs/types/index.js",
+      "types": "./dist/cjs/types/index.d.ts"
     },
     "./topics": {
-      "types": "./dist/topic.d.ts",
-      "import": "./dist/topic.js",
-      "require": "./dist/topic.js"
+      "import": "./dist/esm/topic.js",
+      "require": "./dist/cjs/topic.js",
+      "types": "./dist/cjs/topic.d.ts"
     }
   },
   "files": [
@@ -36,7 +36,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc --project tsconfig.json && rollup --config rollup.config.ts --configPlugin typescript",
+    "build": "rimraf dist && tsc --project tsconfig.cjs.json && tsc --project tsconfig.esm.json && rollup --config rollup.config.ts --configPlugin typescript",
     "typecheck": "tsc --noEmit",
     "generate-lua-library": "pip install -r script/requirements.txt && python script/generatetypescriptfile.py",
     "generate-topic-types": "node script/generatetopictypes.mjs",

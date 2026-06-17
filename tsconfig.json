@@ -1,12 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "commonjs",
     "lib": ["ES2023", "DOM"],
-    "outDir": "./dist",
     "rootDir": "./src",
-    "declaration": true,
-    "declarationDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
