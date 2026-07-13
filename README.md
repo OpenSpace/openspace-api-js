@@ -50,10 +50,10 @@ npm run examples-javascript # JavaScript
 
 Connects to OpenSpace on port **4682** by default.
 
-If you are loading the library as a plain `<script>` tag (e.g. the UMD bundle from `dist/`), the factory function is exposed on `window`:
+If you are loading the library as a plain `<script>` tag (e.g. `openspace-api.js` from the CDN or a downloaded bundle), the factory function is exposed on `window`:
 
 ```html
-<script src="dist/openspace-api.js"></script>
+<script src="openspace-api.js"></script>
 <script>
   const api = window.openspaceApi('localhost', 4682);
 
