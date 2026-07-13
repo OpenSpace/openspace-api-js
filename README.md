@@ -107,6 +107,8 @@ This writes the generated files into `src/types/generated/` and rebuilds the `Al
 
 Connects to a running OpenSpace instance, fetches the full Lua API documentation via the `documentation` topic, and generates `src/types/generated/openspacelualibrary.ts`.
 
+> **Why generate this instead of publishing it once?** The OpenSpace Lua API changes frequently, so these types are generated from a live instance rather than published to `@types` or DefinitelyTyped. Keeping generation in this repo means changes can be reflected immediately without going through an external approval process.
+
 **Prerequisites:**
 
   - Python >= 3.12
