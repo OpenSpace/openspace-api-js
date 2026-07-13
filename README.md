@@ -1,33 +1,127 @@
 # openspace-api-js
-JavaScript library to interface with [OpenSpace](https://github.com/OpenSpace/OpenSpace) using sockets and WebSockets.
 
-## Work in progress
-Both the API and libary are still very much work in progress, and are subject to change.
+TypeScript/JavaScript library for interfacing with [OpenSpace](https://github.com/OpenSpace/OpenSpace) via TCP sockets and WebSockets.
 
-## Documentation
-A [reference](https://openspace.github.io/openspace-api-js) can be found here. Examples are available below:
+## Installation
 
-### NodeJS in the terminal
-https://github.com/OpenSpace/openspace-api-js/blob/master/examples/example.ts provides an example of how to connect from a NodeTS. To run it run the following in a terminal:
+### npm
+
+If you are using npm, install the latest version:
+
+```sh
+npm install openspace-api-js
+```
+
+### Script tag
+
+If you are including the API via a script tag, the preferred approach is to load it directly from the OpenSpace CDN:
+
+```html
+<script type="text/javascript" src="https://liu-se.cdn.openspaceproject.com/api/1.0.0/openspace-api.js"></script>
+```
+
+If you require an offline-capable version, download the [latest release](https://github.com/OpenSpace/openspace-api-js/blob/master/dist/openspace-api.js) and serve it locally:
+
+```html
+<script type="text/javascript" src="openspace-api.js"></script>
+```
+
+## Migration
+
+If you are upgrading from a previous version of this library, please see the [migration guide](https://docs.openspaceproject.com/releases-v0.22/building-content/api/api-migration.html).
+
+## Usage
+
+The TypeScript/JavaScript API can be used in both Node.js setups as well as browser-based setups.
+
+### Node.js (TCP socket)
+
+Connects to OpenSpace on port **4681** by default.
+
+[TypeScript example](https://github.com/OpenSpace/openspace-api-js/blob/master/examples/example.ts) and [JavaScript example](https://github.com/OpenSpace/openspace-api-js/blob/master/examples/example.js) provide examples of how to connect from a Node.js application. To run the bundled Node.js example:
 
 ```sh
 npm install
-npm run example
+npm run examples-typescript # TypeScript
+npm run examples-javascript # JavaScript
 ```
 
-### Simple website
-https://github.com/OpenSpace/openspace-api-js/blob/master/examples/index.html provides an example of connecting to OpenSpace from a website. For simplicity, the example is self-contained in the index.html file.
+### Browser (WebSocket)
 
-### Web application
-For a proper example of how to interact with OpenSpace from a web application using npm, webpack and modern ES versions, please refer to https://github.com/OpenSpace/openspace-api-web-example.
+Connects to OpenSpace on port **4682** by default.
 
-### Observable Notebook
-Use Obserable notebooks to interact with OpenSpace locally:
-https://observablehq.com/@emiax/openspace-notebook-example
-This may be useful for tinkering, GUI prototyping and testing the lua interface during development.
+If you are loading the library as a plain `<script>` tag (e.g. the UMD bundle from `dist/`), the factory function is exposed on `window`:
 
-## API versioning
-The Lua function types in this package are generated against a specific OpenSpace version.
-If your OpenSpace version differs, the API will still work at runtime but type hints
-may be inaccurate. Check the package changelog to see which OpenSpace version the
-types were generated against.
+```html
+<script src="dist/openspace-api.js"></script>
+<script>
+  const api = window.openspaceApi('localhost', 4682);
+
+  api.onConnect(async () => {
+    const openspace = await api.library();
+    const time = await openspace.time.UTC();
+    console.log('Simulation time:', time);
+  });
+
+  api.connect();
+</script>
+```
+
+See [HTML example](https://github.com/OpenSpace/openspace-api-js/blob/master/examples/index.html) for a complete working example. For simplicity, it is self-contained in the index.html file.
+
+If you are importing the library as an ES module from an npm-based project, import the entry point directly:
+
+```ts
+import openspaceApi from 'openspace-api-js';
+
+const api = openspaceApi('localhost', 4682);
+```
+
+## Generating types from your OpenSpace build
+
+The package ships with pre-generated types targeting a specific OpenSpace version. If your build differs, you can regenerate them locally. There are two separate generators, one for topic types and one for the Lua library. Both write directly into `src/types/generated/`.
+
+### Topic types (`generate-topic-types`)
+
+Reads JSON schema files from OpenSpace's `support/types/` directory and compiles them to TypeScript using `json-schema-to-typescript`.
+
+**Prerequisites:**
+
+  - Node.js
+  - OpenSpace version 0.22 or later
+
+**Steps:**
+
+1. Run OpenSpace `DocsWriter.exe`
+1. Locate the `support/types/` directory in your OpenSpace source tree
+1. Run:
+
+```sh
+npm run generate-topic-types -- "<path-to-openspace>/support/types"
+```
+
+This writes the generated files into `src/types/generated/` and rebuilds the `AllTopics` union type used throughout the API.
+
+
+### Lua library types (`generate-lua-library`)
+
+Connects to a running OpenSpace instance, fetches the full Lua API documentation via the `documentation` topic, and generates `src/types/generated/openspacelualibrary.ts`.
+
+**Prerequisites:**
+
+  - Python >= 3.12
+  - The [OpenSpace Python API](https://github.com/OpenSpace/openspace-api-python) must be installed and importable
+  - OpenSpace must be running and reachable on `localhost:4681`
+
+**Steps:**
+
+1. Start OpenSpace.
+1. Run:
+
+```sh
+npm run generate-lua-library
+```
+
+This installs the Python dependencies (via `pip install -r script/requirements.txt`) and runs `script/generatetypescriptfile.py`, writing the result to `src/types/generated/openspacelualibrary.ts`.
+
+> **Note:** The generated file is specific to the OpenSpace version that was running when the script executed. Type hints may be inaccurate if your runtime version differs from the version used to generate them.
