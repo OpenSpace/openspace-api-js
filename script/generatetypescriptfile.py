@@ -122,6 +122,8 @@ def writeCustomTypes(file):
   file.write("type path = string;\n")
   file.write("type table = object;\n")
   file.write("type action = object;\n")
+  file.write("type trail = object;\n")
+  file.write("type position = object;\n")
   file.write("type custompropertytype = any;\n")
   file.write("type integer = number;\n")
   file.write("type vec2 = [number, number];\n")
