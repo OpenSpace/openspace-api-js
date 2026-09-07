@@ -21,7 +21,7 @@ export type EventData =
   | MissionAddedEventData
   | MissionEventReachedEventData
   | MissionRemovedEventData
-  | ParallelConnectionEventData
+  | AstrocastConnectionEventData
   | PlanetEclipsedEventData
   | PointSpacecraftEventData
   | ProfileLoadingFinishedEventData
@@ -49,7 +49,7 @@ export type EventType =
   | 'MissionAdded'
   | 'MissionEventReached'
   | 'MissionRemoved'
-  | 'ParallelConnection'
+  | 'AstrocastConnection'
   | 'PlanetEclipsed'
   | 'PointSpacecraft'
   | 'ProfileLoadingFinished'
@@ -137,9 +137,9 @@ export interface MissionRemovedEventData {
   Identifier: string;
   event: 'MissionRemoved';
 }
-export interface ParallelConnectionEventData {
+export interface AstrocastConnectionEventData {
   State: 'Established' | 'Lost' | 'HostshipGained' | 'HostshipLost';
-  event: 'ParallelConnection';
+  event: 'AstrocastConnection';
 }
 export interface PlanetEclipsedEventData {
   Eclipsee: string;

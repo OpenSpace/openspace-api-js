@@ -35,6 +35,7 @@ export interface Action {
   documentation: string;
   guiPath: string;
   identifier: string;
+  isHidden?: boolean;
   isLocal: boolean;
   name: string;
 }
