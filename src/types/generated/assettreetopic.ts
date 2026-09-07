@@ -6,7 +6,7 @@
  */
 
 export interface AssetTreeTopic {
-  data: PathList | StateSnapshot | State;
+  data: PathList | StateSnapshot | AssetState;
   topicId: 'assetTree';
   topicPayload: {
     event: 'start_subscription' | 'stop_subscription' | 'scan_assets';
@@ -23,7 +23,7 @@ export interface StateSnapshot {
   };
   type: 'stateSnapshot';
 }
-export interface State {
+export interface AssetState {
   path: string;
   state: 'Loaded' | 'Loading' | 'Unloaded' | 'Error';
   type: 'state';
