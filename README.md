@@ -126,3 +126,7 @@ npm run generate-lua-library
 This installs the Python dependencies (via `pip install -r script/requirements.txt`) and runs the script `script/generatetypescriptfile.py`, writing the result to `src/types/generated/openspacelualibrary.ts`.
 
 > **Note:** The generated file is specific to the OpenSpace version that was running when the script executed. Type hints may be inaccurate if your runtime version differs from the version used to generate them.
+
+## Adding a new OpenSpace Topic
+
+Adding a new Topic involves engine-side registration as well as regenerating, testing, and publishing the types above as a `-dev` prerelease before promoting them to a stable release. See [Creating a new OpenSpace Topic](https://docs.openspaceproject.com/latest/contribute/development/api/creating-a-new-topic.html) in the documentation for the full workflow.
