@@ -81,9 +81,9 @@ const api = openspaceApi('localhost', 4682);
 
 The package ships with pre-generated types targeting a specific OpenSpace version. If your build differs, you can regenerate them locally. There are two separate generators, one for topic types and one for the Lua library. Both write directly into `src/types/generated/`.
 
-### Topic types (`generate-topic-types`)
+### Generate topic types (`generate-topic-types`)
 
-Reads JSON schema files from OpenSpace's `support/types/` directory and compiles them to TypeScript using `json-schema-to-typescript`.
+Reads JSON schema files from OpenSpace's `support/types/` directory and compiles them to TypeScript using the npm library `json-schema-to-typescript`.
 
 **Prerequisites:**
 
@@ -97,13 +97,12 @@ Reads JSON schema files from OpenSpace's `support/types/` directory and compiles
 1. Run:
 
 ```sh
-npm run generate-topic-types -- "<path-to-openspace>/support/types"
+npm run generate-topic-types "<path-to-openspace>/support/types"
 ```
 
 This writes the generated files into `src/types/generated/` and rebuilds the `AllTopics` union type used throughout the API.
 
-
-### Lua library types (`generate-lua-library`)
+### Generate Lua library types (`generate-lua-library`)
 
 Connects to a running OpenSpace instance, fetches the full Lua API documentation via the `documentation` topic, and generates `src/types/generated/openspacelualibrary.ts`.
 
@@ -124,6 +123,6 @@ Connects to a running OpenSpace instance, fetches the full Lua API documentation
 npm run generate-lua-library
 ```
 
-This installs the Python dependencies (via `pip install -r script/requirements.txt`) and runs `script/generatetypescriptfile.py`, writing the result to `src/types/generated/openspacelualibrary.ts`.
+This installs the Python dependencies (via `pip install -r script/requirements.txt`) and runs the script `script/generatetypescriptfile.py`, writing the result to `src/types/generated/openspacelualibrary.ts`.
 
 > **Note:** The generated file is specific to the OpenSpace version that was running when the script executed. Type hints may be inaccurate if your runtime version differs from the version used to generate them.
