@@ -97,7 +97,7 @@ Reads JSON schema files from OpenSpace's `support/types/` directory and compiles
 1. Run:
 
 ```sh
-npm run generate-topic-types "<path-to-openspace>/support/types"
+npm run generate-topic-types -- "<path-to-openspace>/support/types"
 ```
 
 This writes the generated files into `src/types/generated/` and rebuilds the `AllTopics` union type used throughout the API.
