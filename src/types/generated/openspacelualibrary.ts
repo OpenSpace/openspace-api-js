@@ -46,6 +46,7 @@ type easingfunction = "Linear" | "QuadraticEaseIn" | "QuadraticEaseOut" |"Quadra
 export interface OpenSpaceLibrary {
   action: ActionLibrary;
   asset: AssetLibrary;
+  astrocast: AstrocastLibrary;
   audio: AudioLibrary;
   dashboard: DashboardLibrary;
   debugging: DebuggingLibrary;
@@ -55,11 +56,12 @@ export interface OpenSpaceLibrary {
   globebrowsing: GlobebrowsingLibrary;
   iswa: IswaLibrary;
   keyframeRecording: KeyframeRecordingLibrary;
+  model: ModelLibrary;
   modules: ModulesLibrary;
+  molecule: MoleculeLibrary;
   navigation: NavigationLibrary;
   openglCapabilities: OpenglCapabilitiesLibrary;
   orbitalnavigation: OrbitalnavigationLibrary;
-  parallel: ParallelLibrary;
   pathnavigation: PathnavigationLibrary;
   scriptScheduler: ScriptSchedulerLibrary;
   sessionRecording: SessionRecordingLibrary;
@@ -74,11 +76,11 @@ export interface OpenSpaceLibrary {
   time: TimeLibrary;
 
   /**
-   * Passes the argument to FileSystem::absolutePath, which resolves occuring path tokens and returns the absolute path.
+   * Passes the argument to FileSystem::absolutePath, which resolves occurring path tokens and returns the absolute path.
    */
   absPath: (path: string) => Promise<path>
   /**
-   * Creates a new property that lives in the `UserProperty` group.
+   * Creates a new property that lives in the `UserProperties` group.
    * @param identifier The identifier that is going to be used for the new property @param type The type of the property, has to be one of \"DMat2Property\", \"DMat3Property\", \"DMat4Property\", \"Mat2Property\", \"Mat3Property\", \"Mat4Property\", \"BoolProperty\", \"DoubleProperty\", \"FloatProperty\", \"IntProperty\", \"StringProperty\", \"StringListProperty\", \"LongProperty\", \"ShortProperty\", \"UIntProperty\", \"ULongProperty\", \"DVec2Property\", \"DVec3Property\", \"DVec4Property\", \"IVec2Property\", \"IVec3Property\", \"IVec4Property\", \"UVec2Property\", \"UVec3Property\", \"UVec4Property\", \"Vec2Property\", \"Vec3Property\", \"Vec4Property\" @param guiName The name that the property uses in the user interface. If this value is not provided, the `identifier` is used instead @param description A description what the property is used for @param onChange A Lua script that will be executed whenever the property changes
    */
   addCustomProperty: (identifier: string, type: custompropertytype, guiName?: string, description?: string, onChange?: string) => Promise<void>
@@ -95,19 +97,19 @@ export interface OpenSpaceLibrary {
    */
   addTag: (uri: string, tag: string) => Promise<void>
   /**
-   * Add a value to the property with the given identifier. Works on both
-   *  numerical and string properties, where adding to a string property means appending
-   *  the given string value to the existing string value.
+   * Add a value to the property with the given identifier. Works on both numerical and
+   *  string properties, where adding to a string property means appending the given
+   *  string value to the existing string value.
    */
   addToPropertyValue: (identifier: string, value: string | number) => Promise<void>
   /**
-   * Add a value to the list property with the given identifier. The
-   *  value can be any type, as long as it is the correct type for the given property.
-   *  Note that a number will be converted to a string automatically.
+   * Add a value to the list property with the given identifier. The value can be any
+   *  type, as long as it is the correct type for the given property. Note that a number
+   *  will be converted to a string automatically.
    */
   appendToListProperty: (identifier: string, value: any) => Promise<void>
   /**
-   * Binds a key to Lua command to both execute locally and broadcast to all clients if this node is hosting a parallel connection.
+   * Binds a key to Lua command to both execute locally and broadcast to all clients if this node is hosting an astrocast connection.
    */
   bindKey: (key: string, action: string | table) => Promise<void>
   /**
@@ -122,6 +124,10 @@ export interface OpenSpaceLibrary {
    * Clear all key bindings.
    */
   clearKeys: () => Promise<void>
+  /**
+   * Returns the name of the computer.
+   */
+  computerName: () => Promise<string>
   /**
    * Returns the whole configuration object as a Dictionary.
    */
@@ -143,33 +149,39 @@ export interface OpenSpaceLibrary {
    */
   directoryForPath: (file: path) => Promise<path>
   /**
-   * Downloads a file from Lua interpreter.
+   * Downloads the provided `url` into the location provided by `savePath`.
+   * @param url The URL to the file that should be downloaded @param savePath The location on disk where the file should be downloaded to @param waitForCompletion If `true`, this function will wait until the download is finished. If the parameter is `false`, the download will occur in the background and this function returns immediately @param overrideExistingFile If `true`, the file will be downloaded even if a file already exists at the `savePath` location. The existing file will be overritten. If it is `false` and a file already exists, no file will be downloaded @returns `true` if the download completed successfully, `false` otherwise. IMPORTANT: If `waitForCompletion` is `true`, this function will always return `true`
    */
-  downloadFile: (url: string, savePath: string, waitForCompletion?: boolean, overrideExistingFile?: boolean) => Promise<void>
+  downloadFile: (url: string, savePath: string, waitForCompletion?: boolean, overrideExistingFile?: boolean) => Promise<boolean>
   /**
    * Extracts the DPI scaling for either the GUI window or if there is no dedicated GUI window, the first window.
    */
   dpiScaling: () => Promise<number>
   /**
-   * Fades in the node(s) with the given identifier over the given time
-   *  in seconds. The identifier can contain a tag and/or a wildcard to target several
-   *  nodes. If the fade time is not provided then the 'OpenSpaceEngine.FadeDuration'
-   *  property will be used instead. If the third argument (endScript) is provided then
-   *  that script will be run after the fade is finished.
+   * Fades in the node(s) with the given identifier over the given time in seconds. The
+   *  identifier can contain a tag and/or a wildcard to target several nodes. If the fade
+   *  time is not provided then the 'OpenSpaceEngine.FadeDuration' property will be used
+   *  stead. If the third argument (endScript) is provided then that script will be run
+   *  ter the fade is finished.
    */
   fadeIn: (identifier: string, fadeTime?: number, endScript?: string) => Promise<void>
   /**
-   * Fades out the node(s) with the given identifier over the given time
-   *  in seconds. The identifier can contain a tag and/or a wildcard to target several
-   *  nodes. If the fade time is not provided then the 'OpenSpaceEngine.FadeDuration'
-   *  property will be used instead. If the third argument (endScript) is provided then
-   *  that script will be run after the fade is finished.
+   * Fades out the node(s) with the given identifier over the given time in seconds. The
+   *  identifier can contain a tag and/or a wildcard to target several nodes. If the fade
+   *  time is not provided then the 'OpenSpaceEngine.FadeDuration' property will be used
+   *  instead. If the third argument (endScript) is provided then that script will be run
+   *  ter the fade is finished.
    */
   fadeOut: (identifier: string, fadeTime?: number, endScript?: string) => Promise<void>
   /**
    * Checks whether the provided file exists.
    */
   fileExists: (file: string) => Promise<boolean>
+  /**
+   * Returns the size of the provided file. The file must exist for this function to work.
+   * @param file The path to the file @returns The size of the file
+   */
+  fileSize: (file: string) => Promise<number>
   /**
    * Get a dictionary containing the current map with custom orderings for the Scene GUI tree. Each key in the dictionary corresponds to a branch in the tree, i.e. a specific GUI path.
    */
@@ -237,20 +249,23 @@ export interface OpenSpaceLibrary {
    */
   makeIdentifier: (input: string) => Promise<string>
   /**
-   * This function marks the scene graph nodes identified by name as
-   *  interesting, which will provide shortcut access to focus buttons and featured
-   *  properties.
+   * This function marks the scene graph nodes identified by name as interesting, which
+   *  ll provide shortcut access to focus buttons and featured properties.
    */
   markInterestingNodes: (sceneGraphNodes: string[]) => Promise<void>
   /**
-   * This function marks interesting times for the current scene, which
-   *  will create shortcuts for a quick access.
+   * This function marks interesting times for the current scene, which will create
+   *  shortcuts for a quick access.
    */
   markInterestingTimes: (times: table[]) => Promise<void>
   /**
    * Returns a list of all scene graph nodes in the scene that have a renderable of the specific type.
    */
   nodeByRenderableType: (type: string) => Promise<string[]>
+  /**
+   * Open a file or folder path in the native OS explorer window. For Windows the path is opened in windows explorer and for Linux the default explorer app.
+   */
+  openFileExplorer: (path: path) => Promise<void>
   /**
    * Logs the passed value to the installed LogManager with a LogLevel of 'Debug'. For Boolean, numbers, and strings, the internal values are printed, for all other types, the type is printed instead
    */
@@ -293,6 +308,14 @@ export interface OpenSpaceLibrary {
    */
   property: (uri: string) => Promise<string[]>
   /**
+   * Returns true if the property identified by the provided URI is enablable and false otherwise. This function will provide an error message if no property matching the URI is found.
+   */
+  propertyEnablable: (uri: string) => Promise<boolean>
+  /**
+   * Returns true if the property identified by the provided URI is enabled and false otherwise. This function will provide an error message if no property matching the URI is found, or if the property is not enablable.
+   */
+  propertyEnabled: (uri: string) => Promise<boolean>
+  /**
    * Returns a list of property owner identifiers that match the passed regular expression. The `uri` identifies the property owner or owner that are returned by this function and can include both wildcards `*` which match anything, as well as tags (`{tag}`) which match scene graph nodes that have this tag. There is also the ability to combine two tags through the `&`, `|`, and `~` operators. `{tag1&tag2}` will match anything that has both tags `tag1` and `tag2`. `{tag1|tag2}` will match anything that has the tag `tag1` or `tag2`, * and `{tag1~tag2}` will match anything that has `tag1` but not `tag2`. If no wildcards or tags are provided at most one property owner identifier will be returned. With wildcards or tags, the identifiers of all property owners that match the URI are returned instead.
    * @param uri The URI that identifies the property owner or owners to get. The URI can contain 0 or 1 wildcard `*` characters or a tag expression (`{tag}`) that identifies a property owner @returns A list of property owner URIs
    */
@@ -318,14 +341,14 @@ export interface OpenSpaceLibrary {
    */
   readFileLines: (file: path) => Promise<string[]>
   /**
-   * Rebinds all scripts from the old key (first argument) to the new
-   *  key (second argument).
+   * Rebinds all scripts from the old key (first argument) to the new key (second
+   *  argument).
    */
   rebindKey: (oldKey: string, newKey: string) => Promise<void>
   /**
-   * This function registers another Lua script that will be periodically executed as long as the application is running. The `identifier` is used to later remove the script. The `script` is being executed every `timeout` seconds. This timeout is only as accurate as the framerate at which the application is running. Optionally the `preScript` Lua script is run when registering the repeated script and the `postScript` is run when unregistering it or when the application closes. If the `timeout` is 0, the script will be executed every frame. The `identifier` has to be a unique name that cannot have been used to register a repeated script before. A registered script is removed with the #removeRepeatedScript function.
+   * This function registers another Lua script that will be periodically executed as long as the application is running. The `identifier` is used to later remove the script. The `script` is being executed every `timeout` seconds. This timeout is only as accurate as the framerate at which the application is running. Optionally the `preScript` Lua script is run when registering the repeated script and the `postScript` is run when unregistering it or when the application closes. If the `timeout` is 0, the script will be executed every frame. The `printToLog` parameter determines whether the `script`, `preScript`, or `postScript` are printed to the script log. he `identifier` has to be a unique name that cannot have been used to register a repeated script before. A registered script is removed with the #removeRepeatedScript function.
    */
-  registerRepeatedScript: (identifier: string, script: string, timeout?: number, preScript?: string, postScript?: string) => Promise<void>
+  registerRepeatedScript: (identifier: string, script: string, timeout?: number, preScript?: string, postScript?: string, printToLog?: boolean) => Promise<void>
   /**
    * Registers the pair of light source, shadower, shadowee, and shadowGroup to act together in order to produce a depth image that is used for shadow calculations. The lightSource, the shadower, and the shadowee must be existing scene graph nodes that are used to calculate the positions of the light and to determine which object is rendered to cast a shadow and which object should receive the shadow. Shadowcasters registered using the same shadow group will have their shadows interact with each other, whereas objects with different shadowGroups will not cast shadows on objects other than the shadowee.
    * @param lightSource The identifier of the scene graph node that should act as the source of the light for shadowing purposes @param shadower The identifier of the scene graph node that is the object that casts a shadow on the shadowee and other shadowers in the tsame shadow group @param shadowee The identifier of the scene graph node that is the object that receives the shadow of the shadower @param shadowGroup An arbitrary name that identifies a shadow group, meaning multiple shadowcaster registrations that should act in unison. The name must not start with a `_` character. If this parameter is omitted, a suitable unique name will be automatically generated
@@ -335,8 +358,15 @@ export interface OpenSpaceLibrary {
    */
   removeCustomProperty: (identifier: string) => Promise<void>
   /**
-   * This function removes unmarks the scene graph nodes identified by
-   *  name as interesting, thus removing the shortcuts from the features properties list.
+   * Removes a value from the list property with the given identifier. The value can be
+   *  any type, as long as it is the correct type for the given property. Note that a
+   *  number will be converted to a string automatically. If the value was not found, this
+   *  function will not do anything.
+   */
+  removeFromListProperty: (identifier: string, value: any) => Promise<void>
+  /**
+   * This function removes unmarks the scene graph nodes identified by name as
+   *  teresting, thus removing the shortcuts from the features properties list.
    */
   removeInterestingNodes: (sceneGraphNodes: string[]) => Promise<void>
   /**
@@ -384,7 +414,7 @@ export interface OpenSpaceLibrary {
   /**
    * Collects all changes that have been made since startup, including all property changes and assets required, requested, or removed. All changes will be added to the profile that OpenSpace was started with, and the new saved file will contain all of this information. If the argument is provided, the settings will be saved into new profile with that name. If the argument is blank, the current profile will be saved to a backup file and the original profile will be overwritten. The second argument determines if a file that already exists should be overwritten, which is 'false' by default.
    */
-  saveSettingsToProfile: (saveFilePath?: string, shouldOverwrite?: boolean) => Promise<void>
+  saveSettingsToProfile: (saveFileName?: string, shouldOverwrite?: boolean) => Promise<void>
   /**
    * Returns a list of all scene graph nodes in the scene.
    */
@@ -402,12 +432,6 @@ export interface OpenSpaceLibrary {
    */
   setCurrentMission: (identifier: string) => Promise<void>
   /**
-   * This function sets the default values for the dashboard consisting
-   *  of 'DashboardItemDate', 'DashboardItemSimulationIncrement', 'DashboardItemDistance',
-   *  'DashboardItemFramerate', and 'DashboardItemParallelConnection'.
-   */
-  setDefaultDashboard: () => Promise<void>
-  /**
    * Set a custom ordering of the items in a specific branch in the Scene GUI tree, i.e. for a specific GUI path.
    * @param guiPath The GUI path for which the order should be set @param list A list of names of scene graph nodes or subgroups in the GUI, in the order of which they should appear in the tree. The list does not have to include all items in the given GUI path. Any excluded items will be placed after the ones in the list
    */
@@ -420,6 +444,14 @@ export interface OpenSpaceLibrary {
    * Registers the path token provided by the first argument to the path in the second argument. If the path token already exists, it will be silently overridden.
    */
   setPathToken: (pathToken: string, path: path) => Promise<void>
+  /**
+   * Sets the enabled setting for the property with the provided URI. The `uri` identifies which property or properties are affected by this function call and can include both wildcards `*` which match anything, as well as tags(`{tag }`) which match scene graph nodes that have this tag. There is also the ability to combine two tags through the `&`, `|`, and `~` operators. `{tag1& tag2}` will match anything that has the tag1 and the tag2. `{tag1 | tag2}` will match anything that has the tag1 or the tag 2, and `{tag1~tag2}` will match anything that has tag1 but not tag2.If no wildcards or tags are provided at most one property value will be changed.With wildcards or tags all properties that match the URI are changed instead.
+   */
+  setPropertyEnabled: (uri: string, value: boolean) => Promise<void>
+  /**
+   * Sets the enabled setting for the property with the provided URI. If you want to change multiple property values simultaneously, also see the #propertySetEnabled function.The `propertySetEnabledSingle` function however will work more efficiently for individual property values.
+   */
+  setPropertyEnabledSingle: (uri: string, value: boolean) => Promise<void>
   /**
    * Sets the property or properties identified by the URI to the specified
    * value. The `uri` identifies which property or properties are affected by this function
@@ -517,17 +549,17 @@ export interface OpenSpaceLibrary {
    */
   ternary: (condition: boolean, trueValue: any, falseValue: any) => Promise<any>
   /**
-   * Toggles the fade state of the node(s) with the given identifier over
-   *  the given time in seconds. The identifier can contain a tag and/or a wildcard to
-   *  target several nodes. If the fade time is not provided then the
-   *  "OpenSpaceEngine.FadeDuration" property will be used instead. If the third argument
-   *  (endScript) is provided then that script will be run after the fade is finished.
+   * Toggles the fade state of the node(s) with the given identifier over the given time
+   *  in seconds. The identifier can contain a tag and/or a wildcard to target several
+   *  nodes. If the fade time is not provided then the "OpenSpaceEngine.FadeDuration"
+   *  operty will be used instead. If the third argument (endScript) is provided then
+   *  at script will be run after the fade is finished.
    */
   toggleFade: (identifier: string, fadeTime?: number, endScript?: string) => Promise<void>
   /**
    * Toggles the shutdown mode that will close the application after the countdown timer is reached.
    */
-  toggleShutdown: () => Promise<void>
+  toggleShutdown: (timer?: number) => Promise<void>
   /**
    * Unloads a previously loaded mission
    */
@@ -572,11 +604,11 @@ export interface OpenSpaceLibrary {
 
 export interface ActionLibrary {
   /**
-   * Returns information about the action as a table with the keys 'Identifier', 'Command', 'Name', 'Documentation', 'GuiPath', and 'Synchronization'.
+   * Returns information about the action as a table with the keys 'Identifier', 'Command', Returns information about the action as a table with the keys: `Identifier`, `Command`, `Name`, `Documentation`, `GuiPath`, `IsLocal`, and `IsHidden`.
    */
   action: (identifier: string) => Promise<table>
   /**
-   * Returns all registered actions in the system as a table of tables each containing the keys 'Identifier', 'Command', 'Name', 'Documentation', 'GuiPath', and 'Synchronization'.
+   * Returns all registered actions in the system as a table of tables each containing the keys 'Identifier', 'Command', 'Name', 'Documentation', 'GuiPath', and keys: `Identifier`, `Command`, `Name`, `Documentation`, `GuiPath`, `IsLocal`, and `IsHidden`.
    */
   actions: () => Promise<table[]>
   /**
@@ -584,7 +616,7 @@ export interface ActionLibrary {
    */
   hasAction: (identifier: string) => Promise<boolean>
   /**
-   * Registers a new action. The first argument is the identifier which cannot have been used to register a previous action before, the second argument is the Lua command that is to be executed, and the optional third argument is the name used in a user-interface to refer to this action. The fourth is a human readable description of the command for documentation purposes. The fifth is the GUI path and the last parameter determines whether the action should be executed locally (= false) or remotely (= true, the default).
+   * Registers a new action. The first argument is the identifier which cannot have been used to register a previous action before, the second argument is the Lua command that is to be executed, and the optional third argument is the name used in a user-interface to refer to this action. The fourth is a human readable description of the command for documentation purposes. The fifth is the GUI path and the last parameter determines whether the action should be executed locally (= true) or remotely (= false, the default).
    */
   registerAction: (action: action) => Promise<void>
   /**
@@ -615,11 +647,11 @@ export interface AssetLibrary {
    */
   parents: (assetName: string) => Promise<path[]>
   /**
-   * Reloads the asset with the specified name. If the asset was previously loaded explicity it will be removed and then re-added. If the asset was not previously loaded, it will only be loaded instead.
+   * Reloads the asset with the specified name. If the asset was previously loaded explicitly it will be removed and then re-added. If the asset was not previously loaded, it will only be loaded instead.
    */
   reload: (assetName: string) => Promise<void>
   /**
-   * Removes the asset with the specfied name from the scene. The parameter to this function is the same that was originally used to load this asset, i.e. the path to the asset file.
+   * Removes the asset with the specified name from the scene. The parameter to this function is the same that was originally used to load this asset, i.e. the path to the asset file.
    */
   remove: (assetName: string) => Promise<void>
   /**
@@ -631,6 +663,28 @@ export interface AssetLibrary {
    */
   rootAssets: () => Promise<path[]>
 } // interface AssetLibrary
+
+export interface AstrocastLibrary {
+  /**
+   * Connect to astrocasting.
+   */
+  connect: () => Promise<void>
+  /**
+   * Disconnect from astrocasting.
+   */
+  disconnect: () => Promise<void>
+  /**
+   */
+  joinServer: (port: string, address: string, serverName: string, password: string, hostpassword?: string, name?: string) => Promise<void>
+  /**
+   * Request to be the host for this session.
+   */
+  requestHostship: (hostPassword?: string) => Promise<void>
+  /**
+   * Resign hostship.
+   */
+  resignHostship: () => Promise<void>
+} // interface AstrocastLibrary
 
 export interface AudioLibrary {
   /**
@@ -649,7 +703,7 @@ export interface AudioLibrary {
    */
   isLooping: (identifier: string) => Promise<boolean>
   /**
-   * Returns whether the track refered to by the \\p identifier is currently playing or paused. If it was be paused through a previous call to #pauseAudio, this function will return `true`. If it has just been created or resumed through a call to #resumeAudio, it will return `false`. The \\p identifier must be a name for a sound that was started through the #playAudio or #playAudio3d functions.
+   * Returns whether the track referred to by the \\p identifier is currently playing or paused. If it was be paused through a previous call to #pauseAudio, this function will return `true`. If it has just been created or resumed through a call to #resumeAudio, it will return `false`. The \\p identifier must be a name for a sound that was started through the #playAudio or #playAudio3d functions.
    * @param identifier The identifier to the track that should be stopped @returns `true` if the track is currently paused, `false` if it is playing
    */
   isPaused: (identifier: string) => Promise<boolean>
@@ -747,7 +801,7 @@ export interface DashboardLibrary {
    */
   addDashboardItem: (dashboard: table) => Promise<void>
   /**
-   * Adds a new dashboard item to an existing SceenSpaceDashboard.
+   * Adds a new dashboard item to an existing ScreenSpaceDashboard.
    */
   addDashboardItemToScreenSpace: (identifier: string, dashboard: table) => Promise<void>
   /**
@@ -870,7 +924,7 @@ export interface ExoplanetsLibrary {
   /**
    * Load a set of exoplanet information based on custom data in the form of a CSV file.
    * The format and column names in the CSV should be the same as the ones provided by the [NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/).
-   * When dowloading the data from the archive we recommend including all columns, since a few required ones are not selected by default.
+   * When downloading the data from the archive we recommend including all columns, since a few required ones are not selected by default.
    * @param csvFile A path to the CSV file to load the data from
    * @returns A list of objects of the type [ExoplanetSystemData](#exoplanets_data_exoplanetsystem), that can be used to create the scene graph nodes for the exoplanet systems
    */
@@ -1113,7 +1167,7 @@ export interface GlobebrowsingLibrary {
    *  @param useAltitude If true, the camera's altitude will also be used for the new
    *  positions. Otherwise, it will not
    */
-  setNodePositionFromCamera: (nodeIdentifer: string, useAltitude?: boolean) => Promise<void>
+  setNodePositionFromCamera: (nodeIdentifier: string, useAltitude?: boolean) => Promise<void>
   /**
    * Return a list of all WMS servers associated with the `renderableGlobe` globe.
    * @param globe The identifier of the `renderableGlobe` to fetch WMS servers for @returns A list of WMS server info containing its name and URL
@@ -1202,12 +1256,33 @@ export interface KeyframeRecordingLibrary {
   updateKeyframe: (index: integer) => Promise<void>
 } // interface KeyframeRecordingLibrary
 
+export interface ModelLibrary {
+  /**
+   * Prints the model tree of the given filepath model file. The node names detected during reading and the hierarchy of the nodes will be printed. This is useful for debugging and finding correct node names for applying custom transformations to internal model nodes.
+   * The given filepath must not be empty, must contain an extension, and must be a valid model file that can be read with the `ModelReaderAssimp` reader. The `ModelReaderAssimp` reader must have been added to the `ModelReader` before calling this function. Will throw a `ModelLoadException` if there was an error reading the file, or a `MissingReaderException` if there was no reader for the specified filepath.
+   * @param filepath The model file on disk whose model tree should be printed.
+   */
+  printModelTree: (filepath: path) => Promise<void>
+} // interface ModelLibrary
+
 export interface ModulesLibrary {
   /**
    * Checks whether the passed OpenSpaceModule is loaded.
    */
   isLoaded: (moduleName: string) => Promise<boolean>
 } // interface ModulesLibrary
+
+export interface MoleculeLibrary {
+  /**
+   * Searches the RCSB protein data bank for the provided molecule id, for example
+   *  '1C17', downloads the PDB file and adds it as a new scene graph node in the center
+   *  of the solar system.
+   *  To find an entry to add, use the search field found at https://www.rcsb.org/, the
+   *  entry id will then be a four letter code listed in the URL when visiting an entry
+   *  or at the top of the page of that entry.
+   */
+  addMoleculePDB: (molecule: string) => Promise<void>
+} // interface MoleculeLibrary
 
 export interface NavigationLibrary {
   /**
@@ -1405,6 +1480,11 @@ export interface NavigationLibrary {
    */
   triggerIdleMotion: (choice?: string) => Promise<void>
   /**
+   * Remove all bindings for a joystick or game controller, including both axes and buttons.
+   * @param joystickName The name for the joystick or game controller
+   */
+  unbindJoystick: (joystickName: string) => Promise<void>
+  /**
    * Fly linearly to a specific distance in relation to the focus node.
    * @param distance The distance to fly to, in meters above the bounding sphere @param duration An optional duration for the motion to take, in seconds
    */
@@ -1483,28 +1563,6 @@ export interface OrbitalnavigationLibrary {
   setRelativeMinDistance: (multiplier: number) => Promise<void>
 } // interface OrbitalnavigationLibrary
 
-export interface ParallelLibrary {
-  /**
-   * Connect to parallel.
-   */
-  connect: () => Promise<void>
-  /**
-   * Disconnect from parallel.
-   */
-  disconnect: () => Promise<void>
-  /**
-   */
-  joinServer: (port: string, address: string, serverName: string, password: string, hostpassword?: string, name?: string) => Promise<void>
-  /**
-   * Request to be the host for this session.
-   */
-  requestHostship: () => Promise<void>
-  /**
-   * Resign hostship.
-   */
-  resignHostship: () => Promise<void>
-} // interface ParallelLibrary
-
 export interface PathnavigationLibrary {
   /**
    * Continue playing a paused camera path.
@@ -1539,13 +1597,17 @@ export interface ScriptSchedulerLibrary {
    */
   loadFile: (fileName: string) => Promise<void>
   /**
-   * Load a single scheduled script. The first argument is the time at which the scheduled script is triggered, the second argument is the script that is executed in the forward direction, the optional third argument is the script executed in the backwards direction, and the optional last argument is the universal script, executed in either direction.
+   * Load a single scheduled script. The first argument is the time at which the scheduled script is triggered, the second argument is the script that is executed in the forward direction, the optional third argument is the script executed in the backwards direction, and the optional last argument is the universal script, executed in either direction. If a group is specified, it must be larger than 0.
    */
   loadScheduledScript: (time: string, forwardScript: string, backwardScript?: string, universalScript?: string, group?: integer) => Promise<void>
   /**
    * Returns the list of all scheduled scripts.
    */
   scheduledScripts: () => Promise<table[]>
+  /**
+   * Schedules a single execution of a script. If the specified `time` is passed, the provided `script` is executed exactly once.
+   */
+  scheduleSingleShotScript: (time: string, script: string) => Promise<void>
 } // interface ScriptSchedulerLibrary
 
 export interface SessionRecordingLibrary {
@@ -1709,7 +1771,7 @@ export interface SkybrowserLibrary {
    */
   startFinetuningTarget: (identifier: string) => Promise<void>
   /**
-   * Starts the setup process of the sky browers. This function calls the Lua function 'sendOutIdsToBrowsers' in all nodes in the cluster.
+   * Starts the setup process of the sky browsers. This function calls the Lua function 'sendOutIdsToBrowsers' in all nodes in the cluster.
    */
   startSetup: () => Promise<void>
   /**
@@ -1717,7 +1779,7 @@ export interface SkybrowserLibrary {
    */
   stopAnimations: (identifier: string) => Promise<void>
   /**
-   * Returns a table of data regarding the current view and the sky browsers and targets.
+   * Returns a table of data regarding the current view and the sky browsers and targets. If no browser is currently selected, an empty table is returned.
    * @returns A table of data regarding the current targets
    */
   targetData: () => Promise<table>
@@ -1740,6 +1802,14 @@ export interface SonificationLibrary {
 
 export interface SpaceLibrary {
   /**
+   * Creates a new scene graph node from the small body object by querying the JPL Small
+   *  Body Database for the provided object. If the object exists, its Keplerian elements
+   *  are retrieved and an orbital path for that object is created. If the search returns
+   *  no result, an error is logged. The function returns the created Trail and Position
+   *  objects.
+   */
+  addSmallBodyObject: (object_search_string: string) => Promise<[ table, table ]>
+  /**
    * Returns the cartesian world position of a ra dec coordinate with distance. If the coordinate is given as strings the format should be ra 'XhYmZs' and dec 'XdYmZs'. If the coordinate is given as numbers the values should be in degrees.
    */
   convertFromRaDec: (rightAscension: number | string, declination: number | string, distance: number) => Promise<vec3>
@@ -1747,6 +1817,14 @@ export interface SpaceLibrary {
    * Returns the formatted ra, dec strings and distance for a given cartesian world coordinate.
    */
   convertToRaDec: (x: number, y: number, z: number) => Promise<[string, string, number]>
+  /**
+   * Takes the provided CSV file, converts it into a SPICE kernel and returns a
+   *  SpiceTranslation instance that can be used to access the information in the CSV
+   *  file using SPICE's superior integral solver.
+   *  The second return value is the spice kernel that should be loaded and unloaded by
+   *  whoever called this function.
+   */
+  csvToSpiceTranslation: (csvPath: string) => Promise<[ translation, spicekernel ]>
   /**
    */
   readKeplerFile: (p: path, type: string) => Promise<table[]>
@@ -1761,6 +1839,11 @@ export interface SpaceLibrary {
 } // interface SpaceLibrary
 
 export interface SpiceLibrary {
+  /**
+   * This function converts a CSV file into SPK format and saves it at the provided path. The last parameter is only used if there are multiple craft specified in the provided CSV file and is selecting which (0-based index) of the list to create a kernel from.
+   * This function returns the SPICE ID of the object for which the kernel was created.
+   */
+  convertCSVtoSPK: (csv: path, spk: path, elementToExtract?: integer) => Promise<integer>
   /**
    * This function converts a TLE file into SPK format and saves it at the provided path. The last parameter is only used if there are multiple craft specified in the provided TLE file and is selecting which (0-based index) of the list to create a kernel from.
    * This function returns the SPICE ID of the object for which the kernel was created.
@@ -1800,7 +1883,7 @@ export interface StatemachineLibrary {
    */
   canGoToState: (state: string) => Promise<boolean>
   /**
-   * Creates a state machine from a list of states and transitions. See State and Transition documentation for details. The optional thrid argument is the identifier of the desired initial state. If left out, the first state in the list will be used.
+   * Creates a state machine from a list of states and transitions. See State and Transition documentation for details. The optional third argument is the identifier of the desired initial state. If left out, the first state in the list will be used.
    */
   createStateMachine: (states: table, transitions: table, startState?: string) => Promise<void>
   /**
@@ -1987,7 +2070,7 @@ export interface TimeLibrary {
    */
   setDeltaTime: (deltaTime: number) => Promise<void>
   /**
-   * Set the list of discrete delta time steps for the simulation speed that can be quickly jumped between. The list will be sorted to be in increasing order. A negative verison of each specified time step will be added per default as well.
+   * Set the list of discrete delta time steps for the simulation speed that can be quickly jumped between. The list will be sorted to be in increasing order. A negative version of each specified time step will be added per default as well.
    * @param deltaTime The list of delta times, given in seconds per real time second. Should only include positive values
    */
   setDeltaTimeSteps: (deltaTime: number[]) => Promise<void>

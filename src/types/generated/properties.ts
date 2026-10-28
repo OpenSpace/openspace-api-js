@@ -133,11 +133,13 @@ export interface AdditionalDataVectorMatrix {
  * via the `definition` "DoubleListProperty".
  */
 export interface DoubleListProperty {
+  isEnabled?: boolean;
   metaData: {
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'DoubleListProperty';
@@ -151,11 +153,13 @@ export interface DoubleListProperty {
  * via the `definition` "IntListProperty".
  */
 export interface IntListProperty {
+  isEnabled?: boolean;
   metaData: {
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'IntListProperty';
@@ -169,11 +173,13 @@ export interface IntListProperty {
  * via the `definition` "StringListProperty".
  */
 export interface StringListProperty {
+  isEnabled?: boolean;
   metaData: {
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'StringListProperty';
@@ -187,12 +193,14 @@ export interface StringListProperty {
  * via the `definition` "DMat2Property".
  */
 export interface DMat2Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'DMat2Property';
@@ -210,12 +218,14 @@ export interface DMat2Property {
  * via the `definition` "DMat3Property".
  */
 export interface DMat3Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'DMat3Property';
@@ -233,12 +243,14 @@ export interface DMat3Property {
  * via the `definition` "DMat4Property".
  */
 export interface DMat4Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'DMat4Property';
@@ -273,12 +285,14 @@ export interface DMat4Property {
  * via the `definition` "Mat2Property".
  */
 export interface Mat2Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'Mat2Property';
@@ -296,12 +310,14 @@ export interface Mat2Property {
  * via the `definition` "Mat3Property".
  */
 export interface Mat3Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'Mat3Property';
@@ -319,12 +335,14 @@ export interface Mat3Property {
  * via the `definition` "Mat4Property".
  */
 export interface Mat4Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'Mat4Property';
@@ -359,6 +377,7 @@ export interface Mat4Property {
  * via the `definition` "OptionProperty".
  */
 export interface OptionProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: {
       options: {
@@ -369,6 +388,7 @@ export interface OptionProperty {
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'OptionProperty';
@@ -382,6 +402,7 @@ export interface OptionProperty {
  * via the `definition` "SelectionProperty".
  */
 export interface SelectionProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: {
       options: string[];
@@ -390,6 +411,7 @@ export interface SelectionProperty {
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'SelectionProperty';
@@ -403,11 +425,13 @@ export interface SelectionProperty {
  * via the `definition` "StringProperty".
  */
 export interface StringProperty {
+  isEnabled?: boolean;
   metaData: {
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'StringProperty';
@@ -426,6 +450,7 @@ export interface TriggerProperty {
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'TriggerProperty';
@@ -444,6 +469,7 @@ export interface BoolProperty {
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'BoolProperty';
@@ -457,12 +483,14 @@ export interface BoolProperty {
  * via the `definition` "DoubleProperty".
  */
 export interface DoubleProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataNumber;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'DoubleProperty';
@@ -476,12 +504,14 @@ export interface DoubleProperty {
  * via the `definition` "FloatProperty".
  */
 export interface FloatProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataNumber;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'FloatProperty';
@@ -495,12 +525,14 @@ export interface FloatProperty {
  * via the `definition` "IntProperty".
  */
 export interface IntProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataNumber;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'IntProperty';
@@ -514,12 +546,14 @@ export interface IntProperty {
  * via the `definition` "LongProperty".
  */
 export interface LongProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataNumber;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'LongProperty';
@@ -533,12 +567,14 @@ export interface LongProperty {
  * via the `definition` "ShortProperty".
  */
 export interface ShortProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataNumber;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'ShortProperty';
@@ -552,12 +588,14 @@ export interface ShortProperty {
  * via the `definition` "UIntProperty".
  */
 export interface UIntProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataNumber;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'UIntProperty';
@@ -571,12 +609,14 @@ export interface UIntProperty {
  * via the `definition` "ULongProperty".
  */
 export interface ULongProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataNumber;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'ULongProperty';
@@ -590,12 +630,14 @@ export interface ULongProperty {
  * via the `definition` "UShortProperty".
  */
 export interface UShortProperty {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataNumber;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'UShortProperty';
@@ -609,12 +651,14 @@ export interface UShortProperty {
  * via the `definition` "DVec2Property".
  */
 export interface DVec2Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'DVec2Property';
@@ -641,12 +685,14 @@ export interface ViewOptions {
  * via the `definition` "DVec3Property".
  */
 export interface DVec3Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'DVec3Property';
@@ -665,12 +711,14 @@ export interface DVec3Property {
  * via the `definition` "DVec4Property".
  */
 export interface DVec4Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'DVec4Property';
@@ -689,12 +737,14 @@ export interface DVec4Property {
  * via the `definition` "IVec2Property".
  */
 export interface IVec2Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'IVec2Property';
@@ -713,12 +763,14 @@ export interface IVec2Property {
  * via the `definition` "IVec3Property".
  */
 export interface IVec3Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'IVec3Property';
@@ -737,12 +789,14 @@ export interface IVec3Property {
  * via the `definition` "IVec4Property".
  */
 export interface IVec4Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'IVec4Property';
@@ -761,12 +815,14 @@ export interface IVec4Property {
  * via the `definition` "UVec2Property".
  */
 export interface UVec2Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'UVec2Property';
@@ -785,12 +841,14 @@ export interface UVec2Property {
  * via the `definition` "UVec3Property".
  */
 export interface UVec3Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'UVec3Property';
@@ -809,12 +867,14 @@ export interface UVec3Property {
  * via the `definition` "UVec4Property".
  */
 export interface UVec4Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'UVec4Property';
@@ -833,12 +893,14 @@ export interface UVec4Property {
  * via the `definition` "Vec2Property".
  */
 export interface Vec2Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'Vec2Property';
@@ -857,12 +919,14 @@ export interface Vec2Property {
  * via the `definition` "Vec3Property".
  */
 export interface Vec3Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'Vec3Property';
@@ -881,12 +945,14 @@ export interface Vec3Property {
  * via the `definition` "Vec4Property".
  */
 export interface Vec4Property {
+  isEnabled?: boolean;
   metaData: {
     additionalData: AdditionalDataVectorMatrix;
     description: string;
     group: string;
     guiName: string;
     identifier: string;
+    isEnablable: boolean;
     isReadOnly: boolean;
     needsConfirmation: boolean;
     type: 'Vec4Property';
@@ -909,6 +975,7 @@ export interface DoubleListPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'DoubleListProperty';
@@ -923,6 +990,7 @@ export interface IntListPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'IntListProperty';
@@ -937,6 +1005,7 @@ export interface StringListPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'StringListProperty';
@@ -952,6 +1021,7 @@ export interface DMat2PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'DMat2Property';
@@ -967,6 +1037,7 @@ export interface DMat3PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'DMat3Property';
@@ -982,6 +1053,7 @@ export interface DMat4PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'DMat4Property';
@@ -997,6 +1069,7 @@ export interface Mat2PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'Mat2Property';
@@ -1012,6 +1085,7 @@ export interface Mat3PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'Mat3Property';
@@ -1027,6 +1101,7 @@ export interface Mat4PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'Mat4Property';
@@ -1046,6 +1121,7 @@ export interface OptionPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'OptionProperty';
@@ -1063,6 +1139,7 @@ export interface SelectionPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'SelectionProperty';
@@ -1077,6 +1154,7 @@ export interface StringPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'StringProperty';
@@ -1091,6 +1169,7 @@ export interface TriggerPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'TriggerProperty';
@@ -1105,6 +1184,7 @@ export interface BoolPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'BoolProperty';
@@ -1120,6 +1200,7 @@ export interface DoublePropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'DoubleProperty';
@@ -1135,6 +1216,7 @@ export interface FloatPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'FloatProperty';
@@ -1150,6 +1232,7 @@ export interface IntPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'IntProperty';
@@ -1165,6 +1248,7 @@ export interface LongPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'LongProperty';
@@ -1180,6 +1264,7 @@ export interface ShortPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'ShortProperty';
@@ -1195,6 +1280,7 @@ export interface UIntPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'UIntProperty';
@@ -1210,6 +1296,7 @@ export interface ULongPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'ULongProperty';
@@ -1225,6 +1312,7 @@ export interface UShortPropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'UShortProperty';
@@ -1240,6 +1328,7 @@ export interface DVec2PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'DVec2Property';
@@ -1256,6 +1345,7 @@ export interface DVec3PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'DVec3Property';
@@ -1272,6 +1362,7 @@ export interface DVec4PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'DVec4Property';
@@ -1288,6 +1379,7 @@ export interface IVec2PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'IVec2Property';
@@ -1304,6 +1396,7 @@ export interface IVec3PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'IVec3Property';
@@ -1320,6 +1413,7 @@ export interface IVec4PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'IVec4Property';
@@ -1336,6 +1430,7 @@ export interface UVec2PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'UVec2Property';
@@ -1352,6 +1447,7 @@ export interface UVec3PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'UVec3Property';
@@ -1368,6 +1464,7 @@ export interface UVec4PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'UVec4Property';
@@ -1384,6 +1481,7 @@ export interface Vec2PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'Vec2Property';
@@ -1400,6 +1498,7 @@ export interface Vec3PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'Vec3Property';
@@ -1416,6 +1515,7 @@ export interface Vec4PropertyMetaData {
   group: string;
   guiName: string;
   identifier: string;
+  isEnablable: boolean;
   isReadOnly: boolean;
   needsConfirmation: boolean;
   type: 'Vec4Property';
