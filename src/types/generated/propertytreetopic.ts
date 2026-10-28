@@ -10,6 +10,10 @@ import type { BoolPropertyMetaData, DMat2PropertyMetaData, DMat3PropertyMetaData
 export interface PropertyTreeTopic {
   data:
     | {
+        /**
+         * Whether the property is enabled. Only sent for enablable properties
+         */
+        isEnabled?: boolean;
         type: 'value';
         /**
          * The URI of the property this value corresponds to
