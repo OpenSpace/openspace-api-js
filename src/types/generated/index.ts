@@ -3,6 +3,7 @@
 export * from './properties';
 export * from './openspacelualibrary';
 export * from './actionkeybindtopic';
+export * from './assettreetopic';
 export * from './authorizationtopic';
 export * from './camerapathtopic';
 export * from './cameratopic';
@@ -26,6 +27,7 @@ export * from './triggerpropertytopic';
 export * from './versiontopic';
 
 import { ActionKeybindTopic } from './actionkeybindtopic';
+import { AssetTreeTopic } from './assettreetopic';
 import { AuthorizationTopic } from './authorizationtopic';
 import { CameraPathTopic } from './camerapathtopic';
 import { CameraTopic } from './cameratopic';
@@ -50,6 +52,7 @@ import { VersionTopic } from './versiontopic';
 
 export type AllTopics =
   | ActionKeybindTopic
+  | AssetTreeTopic
   | AuthorizationTopic
   | CameraPathTopic
   | CameraTopic
